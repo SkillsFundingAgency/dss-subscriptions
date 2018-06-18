@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System;
 using System.Web.Http.Description;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Subscriptions.PutSubscriptionHttpTrigger
 { 
@@ -14,7 +15,8 @@ namespace NCS.DSS.Subscriptions.PutSubscriptionHttpTrigger
     {
         [FunctionName("PUT")]
         [ResponseType(typeof(Models.Subscription))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "Put", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string subscriptionid)
+        [Display(Name = "Put", Description = "Ability to replace a session object for a given customer.")]
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string customerId, string subscriptionid)
         {
             log.Info("C# HTTP trigger function Put Subscription processed a request.");
             

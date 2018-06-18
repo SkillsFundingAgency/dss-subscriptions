@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System;
 using System.Web.Http.Description;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Subscriptions.GetSubscriptionByIdHttpTrigger
 { 
@@ -14,7 +15,8 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionByIdHttpTrigger
     {
         [FunctionName("GETByID")]
         [ResponseType(typeof(Models.Subscription))]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string subscriptionid)
+        [Display(Name = "Get", Description = "Ability to get a session object for a given customer.")]
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string customerId, string subscriptionid)
         {
             log.Info("C# HTTP trigger function Get Subscription By Id processed a request.");
 

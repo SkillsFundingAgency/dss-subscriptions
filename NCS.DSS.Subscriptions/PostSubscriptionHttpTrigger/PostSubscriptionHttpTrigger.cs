@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System;
 using System.Web.Http.Description;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Subscriptions.PostSubscriptionHttpTrigger
 { 
@@ -14,7 +15,8 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionHttpTrigger
     {
         [FunctionName("POST")]
         [ResponseType(typeof(Models.Subscription))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "Post", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string subscriptionid)
+        [Display(Name = "Post", Description = "Ability to add a session object for a given customer.")]
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string customerId, string subscriptionid)
         {
             log.Info("C# HTTP trigger function Post Subscription processed a request.");
             

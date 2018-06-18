@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System;
 using System.Web.Http.Description;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Subscriptions.PatchSubscriptionHttpTrigger
 { 
@@ -14,7 +15,8 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionHttpTrigger
     {
         [FunctionName("PATCH")]
         [ResponseType(typeof(Models.Subscription))]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "Patch", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string subscriptionid)
+        [Display(Name = "Patch", Description = "Ability to update a session object for a given customer.")]
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string customerId, string subscriptionid)
         {
             log.Info("C# HTTP trigger function Patch Subscription processed a request.");
             
