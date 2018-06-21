@@ -8,12 +8,16 @@ using System.Threading.Tasks;
 using System;
 using System.Web.Http.Description;
 using System.ComponentModel.DataAnnotations;
+using NCS.DSS.Subscriptions.Annotations;
 
 namespace NCS.DSS.Subscriptions.PatchSubscriptionHttpTrigger
 { 
     public static class PatchSubscriptionHttpTrigger
     {
         [FunctionName("PATCH")]
+        [SubscriptionsResponse(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Subscription Details Updated", ShowSchema = true)]
+        [SubscriptionsResponse(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Unable to Update Subscription Details", ShowSchema = false)]
+        [SubscriptionsResponse(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Forbidden", ShowSchema = false)]
         [ResponseType(typeof(Models.Subscription))]
         [Display(Name = "Patch", Description = "Ability to update a session object for a given customer.")]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string customerId, string subscriptionid)

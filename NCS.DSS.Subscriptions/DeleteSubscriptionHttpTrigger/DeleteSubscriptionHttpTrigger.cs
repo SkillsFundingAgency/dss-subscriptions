@@ -8,12 +8,16 @@ using System.Threading.Tasks;
 using System;
 using System.Web.Http.Description;
 using System.ComponentModel.DataAnnotations;
+using NCS.DSS.Subscriptions.Annotations;
 
 namespace NCS.DSS.Subscriptions.DeleteSubscriptionHttpTrigger
 { 
     public static class DeleteSubscriptionHttpTrigger
     {
         [FunctionName("DELETE")]
+        [SubscriptionsResponse(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Subscription Details Deleted", ShowSchema = true)]
+        [SubscriptionsResponse(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Unable to Delete Subscription Details", ShowSchema = false)]
+        [SubscriptionsResponse(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Forbidden", ShowSchema = false)]
         [ResponseType(typeof(Models.Subscription))]
         [Display(Name = "Delete", Description = "Ability to delete a subscriptions object for a given customer.")]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "customers/{customerId}/subscriptions/{subscriptionid}")]HttpRequestMessage req, TraceWriter log, string customerId, string subscriptionid)
