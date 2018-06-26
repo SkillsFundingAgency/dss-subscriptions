@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace NCS.DSS.Subscriptions.Annotations
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
-    public class SubscriptionsResponse : Attribute
+    public class Response : Attribute
     {
         public int HttpStatusCode { get; set; }
         public string Description { get; set; }

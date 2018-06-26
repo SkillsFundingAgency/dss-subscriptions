@@ -17,7 +17,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using NCS.DSS.Subscriptions.Annotations;
 
-namespace NCS.DSS.Sessions.APIDefinition
+namespace NCS.DSS.Subscriptions.APIDefinition
 {
     public static class ApiDefinition
     {
@@ -245,17 +245,17 @@ namespace NCS.DSS.Sessions.APIDefinition
             }
 
             // automatically get data(http code, description and show schema) from the new custom response class
-            var responseCodes = methodInfo.GetCustomAttributes(typeof(SubscriptionsResponse), false);
+            var responseCodes = methodInfo.GetCustomAttributes(typeof(Response), false);
 
             foreach (var response in responseCodes)
             {
-                var subscriptionsResponse = (SubscriptionsResponse)response;
+                var CustomerResponse = (Response)response;
 
-                if (!subscriptionsResponse.ShowSchema)
+                if (!CustomerResponse.ShowSchema)
                     responseDef = new ExpandoObject();
 
-                responseDef.description = subscriptionsResponse.Description;
-                AddToExpando(responses, subscriptionsResponse.HttpStatusCode.ToString(), responseDef);
+                responseDef.description = CustomerResponse.Description;
+                AddToExpando(responses, CustomerResponse.HttpStatusCode.ToString(), responseDef);
             }
 
             return responses;
@@ -370,8 +370,11 @@ namespace NCS.DSS.Sessions.APIDefinition
                 dynamic propDef = new ExpandoObject();
                 propDef.description = GetPropertyDescription(property);
 
-                var stringAttribute = (StringLengthAttribute)property.GetCustomAttributes(typeof(StringLengthAttribute), false).FirstOrDefault();
+                var exampleAttribute = (Example)property.GetCustomAttributes(typeof(Example), false).FirstOrDefault();
+                if (exampleAttribute != null)
+                    propDef.example = exampleAttribute.Description;
 
+                var stringAttribute = (StringLengthAttribute)property.GetCustomAttributes(typeof(StringLengthAttribute), false).FirstOrDefault();
                 if (stringAttribute != null)
                 {
                     propDef.maxLength = stringAttribute.MaximumLength;
@@ -379,11 +382,8 @@ namespace NCS.DSS.Sessions.APIDefinition
                 }
 
                 var regexAttribute = (RegularExpressionAttribute)property.GetCustomAttributes(typeof(RegularExpressionAttribute), false).FirstOrDefault();
-
                 if (regexAttribute != null)
-                {
                     propDef.pattern = regexAttribute.Pattern;
-                }
 
                 SetParameterType(property.PropertyType, propDef, definitions);
                 AddToExpando(objDef.properties, property.Name, propDef);
@@ -473,7 +473,7 @@ namespace NCS.DSS.Sessions.APIDefinition
                     if (string.IsNullOrEmpty(description))
                         description = item.ToString();
 
-                    enumValues.Add(description);
+                    enumValues.Add(Convert.ToInt32(item) + " - " + description);
                 }
 
                 opParam.@enum = enumValues.ToArray();
