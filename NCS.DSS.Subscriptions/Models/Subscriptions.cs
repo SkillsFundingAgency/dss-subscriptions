@@ -1,14 +1,10 @@
 ﻿using NCS.DSS.Subscriptions.Annotations;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Subscriptions.Models
 {
-    public class Subscriptions
+    public class Subscriptions : ISubscription
     {
         [Required]
         [Display(Description = "Unique identifier of a subscription")]
@@ -36,15 +32,18 @@ namespace NCS.DSS.Subscriptions.Models
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         public Guid? LastModifiedBy { get; set; }
 
+        public void SetDefaultValues()
+        {
+            SubscriptionId = Guid.NewGuid();
 
+            if (!LastModifiedDate.HasValue)
+                LastModifiedDate = DateTime.UtcNow;
+        }
 
         public void Patch(SubscriptionsPatch subscriptionsPatch)
         {
             if (subscriptionsPatch == null)
                 return;
-
-            if (subscriptionsPatch.TouchPointId != null)
-                this.TouchPointId = subscriptionsPatch.TouchPointId;
 
             if (subscriptionsPatch.Subscribe.HasValue)
                 this.Subscribe = subscriptionsPatch.Subscribe;

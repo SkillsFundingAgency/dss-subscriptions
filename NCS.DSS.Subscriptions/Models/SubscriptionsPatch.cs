@@ -1,27 +1,11 @@
 ﻿using NCS.DSS.Subscriptions.Annotations;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Subscriptions.Models
 {
-    public class SubscriptionsPatch
+    public class SubscriptionsPatch : ISubscription
     {
-
-        [Display(Description = "Unique identifier of a subscription")]
-        [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
-        public Guid? SubscriptionId { get; set; }
-
-        [Display(Description = "Unique identifier of a customer")]
-        [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
-        public Guid? CustomerId { get; set; }
-
-        [Display(Description = "Unique identifier of a touchpoint")]
-        [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
-        public Guid? TouchPointId { get; set; }
 
         [Display(Description = "Indicator to register an interest in changes to the given customer record.  true indicates subscribe, false is unsubscribe")]
         [Example(Description = "true/false")]
@@ -34,5 +18,11 @@ namespace NCS.DSS.Subscriptions.Models
         [Display(Description = "Unique identifier of the touchpoint making the change")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         public Guid? LastModifiedBy { get; set; }
+
+        public void SetDefaultValues()
+        {
+            if (!LastModifiedDate.HasValue)
+                LastModifiedDate = DateTime.UtcNow;
+        }
     }
 }
