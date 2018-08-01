@@ -3,11 +3,36 @@
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="DeleteSubscriptionHttpTrigger\**" />
+    <Compile Remove="GetSubscriptionByIdHttpTrigger\**" />
+    <Compile Remove="GetSubscriptionHttpTrigger\**" />
+    <Compile Remove="PatchSubscriptionHttpTrigger\**" />
+    <Compile Remove="PostSubscriptionHttpTrigger\**" />
+    <Compile Remove="PutSubscriptionHttpTrigger\**" />
+    <EmbeddedResource Remove="DeleteSubscriptionHttpTrigger\**" />
+    <EmbeddedResource Remove="GetSubscriptionByIdHttpTrigger\**" />
+    <EmbeddedResource Remove="GetSubscriptionHttpTrigger\**" />
+    <EmbeddedResource Remove="PatchSubscriptionHttpTrigger\**" />
+    <EmbeddedResource Remove="PostSubscriptionHttpTrigger\**" />
+    <EmbeddedResource Remove="PutSubscriptionHttpTrigger\**" />
+    <None Remove="DeleteSubscriptionHttpTrigger\**" />
+    <None Remove="GetSubscriptionByIdHttpTrigger\**" />
+    <None Remove="GetSubscriptionHttpTrigger\**" />
+    <None Remove="PatchSubscriptionHttpTrigger\**" />
+    <None Remove="PostSubscriptionHttpTrigger\**" />
+    <None Remove="PutSubscriptionHttpTrigger\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.6.4" />
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="1.9.1" />
+    <PackageReference Include="Microsoft.Azure.Webjobs.ServiceBus" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.13" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
