@@ -77,7 +77,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
 
             return subscriptions == null
                 ? HttpResponseMessageHelper.BadRequest(customerGuid)
-                : HttpResponseMessageHelper.Created(subscriptions);
+                : HttpResponseMessageHelper.Created(JsonHelper.SerializeObject(subscriptions));
         }
     }
 }
