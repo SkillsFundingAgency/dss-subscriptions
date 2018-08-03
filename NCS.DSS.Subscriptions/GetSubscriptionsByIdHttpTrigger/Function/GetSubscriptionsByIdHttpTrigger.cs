@@ -47,7 +47,7 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Function
 
             return subscriptions == null ? 
                 HttpResponseMessageHelper.NoContent(subscriptionsGuid) :
-                HttpResponseMessageHelper.Ok(subscriptions);
+                HttpResponseMessageHelper.Ok(JsonHelper.SerializeObject(subscriptions));
         }
     }
 }

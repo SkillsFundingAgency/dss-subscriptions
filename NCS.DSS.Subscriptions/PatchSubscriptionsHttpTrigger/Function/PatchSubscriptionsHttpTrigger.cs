@@ -86,7 +86,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
 
             return updatedSubscriptions == null ? 
                 HttpResponseMessageHelper.BadRequest(subscriptionsGuid) :
-                HttpResponseMessageHelper.Ok(updatedSubscriptions);
+                HttpResponseMessageHelper.Ok(JsonHelper.SerializeObject(updatedSubscriptions));
         }
     }
 }
