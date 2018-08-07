@@ -7,6 +7,6 @@ namespace NCS.DSS.Subscriptions.Helpers
     public interface IHttpRequestMessageHelper
     {
         Task<T> GetSubscriptionsFromRequest<T>(HttpRequestMessage req);
-        Guid? GetTouchpointId(HttpRequestMessage req);
+        string GetTouchpointId(HttpRequestMessage req);
     }
 }
