@@ -6,9 +6,9 @@ namespace NCS.DSS.Subscriptions.Models
 {
     public class Subscriptions : ISubscription
     {
-        [Required]
         [Display(Description = "Unique identifier of a subscription")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
+        [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
         public Guid? SubscriptionId { get; set; }
 
         [Required]
