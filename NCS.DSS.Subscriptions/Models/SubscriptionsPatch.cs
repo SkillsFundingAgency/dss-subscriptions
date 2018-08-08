@@ -6,7 +6,6 @@ namespace NCS.DSS.Subscriptions.Models
 {
     public class SubscriptionsPatch : ISubscription
     {
-
         [Display(Description = "Indicator to register an interest in changes to the given customer record.  true indicates subscribe, false is unsubscribe")]
         [Example(Description = "true/false")]
         public Boolean? Subscribe { get; set; }
