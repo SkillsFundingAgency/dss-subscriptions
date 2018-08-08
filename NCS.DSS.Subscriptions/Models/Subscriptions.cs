@@ -16,9 +16,10 @@ namespace NCS.DSS.Subscriptions.Models
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         public Guid? CustomerId { get; set; }
 
-        [Display(Description = "Unique identifier of a touchpoint")]
-        [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
-        public Guid? TouchPointId { get; set; }
+        [StringLength(10, MinimumLength = 10)]
+        [Display(Description = "Identifier of the touchpoint who made the last change to the record")]
+        [Example(Description = "0000000001")]
+        public string TouchPointId { get; set; }
 
         [Display(Description = "Indicator to register an interest in changes to the given customer record.  true indicates subscribe, false is unsubscribe")]
         [Example(Description = "true/false")]
