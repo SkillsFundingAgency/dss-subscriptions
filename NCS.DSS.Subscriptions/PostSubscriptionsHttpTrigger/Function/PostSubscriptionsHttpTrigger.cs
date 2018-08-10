@@ -61,7 +61,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             if (subscriptionsRequest == null)
                 return HttpResponseMessageHelper.UnprocessableEntity(req);
 
-            subscriptionsRequest.LastModifiedBy = touchpointId;
+            subscriptionsRequest.SetIds(customerGuid, touchpointId);
 
             var errors = validate.ValidateResource(subscriptionsRequest);
 
