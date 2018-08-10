@@ -11,7 +11,6 @@ namespace NCS.DSS.Subscriptions.Models
         [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
         public Guid? SubscriptionId { get; set; }
 
-        [Required]
         [Display(Description = "Unique identifier of a customer")]
         [Example(Description = "b8592ff8-af97-49ad-9fb2-e5c3c717fd85")]
         public Guid? CustomerId { get; set; }
@@ -23,7 +22,7 @@ namespace NCS.DSS.Subscriptions.Models
 
         [Display(Description = "Indicator to register an interest in changes to the given customer record.  true indicates subscribe, false is unsubscribe")]
         [Example(Description = "true/false")]
-        public Boolean? Subscribe { get; set; }
+        public bool? Subscribe { get; set; }
 
         [Display(Description = "Last modified date & time")]
         [Example(Description = "2018-06-21T14:45:00")]
@@ -36,10 +35,16 @@ namespace NCS.DSS.Subscriptions.Models
 
         public void SetDefaultValues()
         {
-            SubscriptionId = Guid.NewGuid();
 
             if (!LastModifiedDate.HasValue)
                 LastModifiedDate = DateTime.UtcNow;
+        }
+
+        public void SetIds(Guid customerId, string touchpointId)
+        {
+            SubscriptionId = Guid.NewGuid();
+            CustomerId = customerId;
+            LastModifiedBy = touchpointId;
         }
 
         public void Patch(SubscriptionsPatch subscriptionsPatch)
