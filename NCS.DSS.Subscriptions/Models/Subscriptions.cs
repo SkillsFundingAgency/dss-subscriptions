@@ -44,6 +44,7 @@ namespace NCS.DSS.Subscriptions.Models
         {
             SubscriptionId = Guid.NewGuid();
             CustomerId = customerId;
+            TouchPointId = touchpointId;
             LastModifiedBy = touchpointId;
         }
 
