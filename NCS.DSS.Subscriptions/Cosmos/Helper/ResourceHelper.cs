@@ -12,5 +12,13 @@ namespace NCS.DSS.Subscriptions.Cosmos.Helper
 
             return doesCustomerExist;
         }
+
+        public bool DoesSubscriptionExist(Guid customerId, string touchpointId)
+        {
+            var documentDbProvider = new DocumentDBProvider();
+            var doesSubscriptionExist = documentDbProvider.DoesSubscriptionExist(customerId, touchpointId);
+
+            return doesSubscriptionExist;
+        }
     }
 }
