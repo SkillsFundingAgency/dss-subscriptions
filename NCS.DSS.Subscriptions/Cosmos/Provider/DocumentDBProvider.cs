@@ -7,8 +7,6 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using NCS.DSS.Subscriptions.Cosmos.Client;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
-using NCS.DSS.Subscriptions.Cosmos.Provider;
-using NCS.DSS.Subscriptions.Models;
 
 namespace NCS.DSS.Subscriptions.Cosmos.Provider
 {
@@ -34,6 +32,22 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
 
             var customerQuery = client.CreateDocumentQuery<Document>(collectionUri, new FeedOptions() { MaxItemCount = 1 });
             return customerQuery.Where(x => x.Id == customerId.ToString()).Select(x => x.Id).AsEnumerable().Any();
+        }
+
+        public bool DoesSubscriptionExist(Guid customerId, string touchpointId)
+        {
+            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+
+            var client = _databaseClient.CreateDocumentClient();
+
+            if (client == null)
+                return false;
+
+            var subscriptionQuery = client.CreateDocumentQuery<Models.Subscriptions>(collectionUri, new FeedOptions() { MaxItemCount = 1 });
+            return subscriptionQuery.Where(x => x.CustomerId == customerId && 
+                                                x.TouchPointId == touchpointId &&
+                                                x.Subscribe == true)
+                .Select(x => x.SubscriptionId).AsEnumerable().Any();
         }
 
         public async Task<List<Models.Subscriptions>> SearchAllSubscriptions()
@@ -108,5 +122,6 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
 
             return response;
         }
+
     }
 }

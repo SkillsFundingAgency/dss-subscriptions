@@ -73,6 +73,11 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             if (!doesCustomerExist)
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
+            var doesSubscriptionExist = resourceHelper.DoesSubscriptionExist(customerGuid, touchpointId);
+
+            if (doesSubscriptionExist)
+                return HttpResponseMessageHelper.Conflict();
+
             var subscriptions = await subscriptionsPostService.CreateAsync(subscriptionsRequest);
 
             return subscriptions == null
