@@ -12,33 +12,33 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
 {
     public class DocumentDBProvider : IDocumentDBProvider
     {
-        private readonly DocumentDBHelper _documentDbHelper;
-        private readonly DocumentDBClient _databaseClient;
-
-        public DocumentDBProvider()
+        public async Task<bool> DoesCustomerResourceExist(Guid customerId)
         {
-            _documentDbHelper = new DocumentDBHelper();
-            _databaseClient = new DocumentDBClient();
-        }
+            var documentUri = DocumentDBHelper.CreateCustomerDocumentUri(customerId);
 
-        public bool DoesCustomerResourceExist(Guid customerId)
-        {
-            var collectionUri = _documentDbHelper.CreateCustomerDocumentCollectionUri();
-
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return false;
+            try
+            {
+                var response = await client.ReadDocumentAsync(documentUri);
+                if (response.Resource != null)
+                    return true;
+            }
+            catch (DocumentClientException)
+            {
+                return false;
+            }
 
-            var customerQuery = client.CreateDocumentQuery<Document>(collectionUri, new FeedOptions() { MaxItemCount = 1 });
-            return customerQuery.Where(x => x.Id == customerId.ToString()).Select(x => x.Id).AsEnumerable().Any();
+            return false;
         }
 
         public bool DoesSubscriptionExist(Guid customerId, string touchpointId)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return false;
@@ -52,9 +52,9 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
 
         public async Task<List<Models.Subscriptions>> SearchAllSubscriptions()
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -62,69 +62,69 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
             var queryCust = client.CreateDocumentQuery<Models.Subscriptions>(collectionUri)
                 .AsDocumentQuery();
 
-            var Subscriptions = new List<Models.Subscriptions>();
+            var subscriptions = new List<Models.Subscriptions>();
 
             while (queryCust.HasMoreResults)
             {
                 var response = await queryCust.ExecuteNextAsync<Models.Subscriptions>();
-                Subscriptions.AddRange(response);
+                subscriptions.AddRange(response);
             }
 
-            return Subscriptions.Any() ? Subscriptions : null;
+            return subscriptions.Any() ? subscriptions : null;
         }
 
 
         public async Task<Models.Subscriptions> GetSubscriptionsForCustomerAsync(Guid? customerId, Guid? subscriptionId)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
-            var SubscriptionsByIdQuery = client
+            var subscriptionsByIdQuery = client
                 ?.CreateDocumentQuery<Models.Subscriptions>(collectionUri, new FeedOptions { MaxItemCount = 1 })
                 .Where(x => x.SubscriptionId == subscriptionId && x.CustomerId == customerId)
                 .AsDocumentQuery();
 
-            if (SubscriptionsByIdQuery == null)
+            if (subscriptionsByIdQuery == null)
                 return null;
 
-            var Customer = await SubscriptionsByIdQuery.ExecuteNextAsync<Models.Subscriptions>();
+            var customer = await subscriptionsByIdQuery.ExecuteNextAsync<Models.Subscriptions>();
 
-            return Customer?.FirstOrDefault();
+            return customer?.FirstOrDefault();
         }
 
 
-        public async Task<List<Models.Subscriptions>> GetSubscriptionsForTouchpointAsync(Guid? customerId, string TouchpointId)
+        public async Task<List<Models.Subscriptions>> GetSubscriptionsForTouchpointAsync(Guid? customerId, string touchpointId)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
-            var SubscriptionsForTouchpointQuery = client
+            var subscriptionsForTouchpointQuery = client
                 ?.CreateDocumentQuery<Models.Subscriptions>(collectionUri)
-                .Where(x => x.CustomerId == customerId && x.TouchPointId == TouchpointId)
+                .Where(x => x.CustomerId == customerId && x.TouchPointId == touchpointId)
                 .AsDocumentQuery();
 
-            if (SubscriptionsForTouchpointQuery == null)
+            if (subscriptionsForTouchpointQuery == null)
                 return null;
 
-            var Subscriptions = new List<Models.Subscriptions>();
+            var subscriptions = new List<Models.Subscriptions>();
 
-            while (SubscriptionsForTouchpointQuery.HasMoreResults)
+            while (subscriptionsForTouchpointQuery.HasMoreResults)
             {
-                var response = await SubscriptionsForTouchpointQuery.ExecuteNextAsync<Models.Subscriptions>();
-                Subscriptions.AddRange(response);
+                var response = await subscriptionsForTouchpointQuery.ExecuteNextAsync<Models.Subscriptions>();
+                subscriptions.AddRange(response);
             }
 
-            return Subscriptions.Any() ? Subscriptions : null;
+            return subscriptions.Any() ? subscriptions : null;
         }
         
 
         public async Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -137,9 +137,9 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
 
         public async Task<ResourceResponse<Document>> UpdateSubscriptionsAsync(Models.Subscriptions subscriptions)
         {
-            var documentUri = _documentDbHelper.CreateDocumentUri(subscriptions.SubscriptionId);
+            var documentUri = DocumentDBHelper.CreateDocumentUri(subscriptions.SubscriptionId);
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;

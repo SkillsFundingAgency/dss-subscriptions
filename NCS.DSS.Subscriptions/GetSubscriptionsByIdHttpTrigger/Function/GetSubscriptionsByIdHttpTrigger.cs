@@ -38,7 +38,7 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Function
             if (!Guid.TryParse(subscriptionId, out var subscriptionsGuid))
                 return HttpResponseMessageHelper.BadRequest(subscriptionsGuid);
 
-            var doesCustomerExist = resourceHelper.DoesCustomerExist(customerGuid);
+            var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
                 return HttpResponseMessageHelper.NoContent(customerGuid);
