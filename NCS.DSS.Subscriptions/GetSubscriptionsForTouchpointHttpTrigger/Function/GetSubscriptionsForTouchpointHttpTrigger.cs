@@ -45,7 +45,7 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
 
             return subscriptions == null ? 
                 HttpResponseMessageHelper.NoContent(customerGuid) :
-                HttpResponseMessageHelper.Ok(JsonHelper.SerializeObject(subscriptions));
+                HttpResponseMessageHelper.Ok(JsonHelper.SerializeObjects(subscriptions));
         }
     }
 }
