@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.Helpers;
 using NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Service;
+using NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Service;
 using NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service;
 using NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger;
 using NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service;
@@ -16,6 +17,7 @@ namespace NCS.DSS.Subscriptions.Ioc
         {
             var services = new ServiceCollection();
 
+            services.AddTransient<IGetSubscriptionsForTouchpointHttpTriggerService, GetSubscriptionsForTouchpointHttpTriggerService>();
             services.AddTransient<IGetSubscriptionsByIdHttpTriggerService, GetSubscriptionsByIdHttpTriggerService>();
             services.AddTransient<IPostSubscriptionsHttpTriggerService, PostSubscriptionsHttpTriggerService>();
             services.AddTransient<IPatchSubscriptionsHttpTriggerService, PatchSubscriptionsHttpTriggerService>();
