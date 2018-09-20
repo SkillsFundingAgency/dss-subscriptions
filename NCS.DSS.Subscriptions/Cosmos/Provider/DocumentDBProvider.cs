@@ -93,7 +93,27 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
             return Customer?.FirstOrDefault();
         }
 
-                
+
+        public async Task<Models.Subscriptions> GetSubscriptionsForTouchpointAsync(Guid? customerId, string TouchpointId)
+        {
+            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+
+            var client = _databaseClient.CreateDocumentClient();
+
+            var SubscriptionsForTouchpointQuery = client
+                ?.CreateDocumentQuery<Models.Subscriptions>(collectionUri)
+                .Where(x => x.CustomerId == customerId && x.TouchPointId == TouchpointId)
+                .AsDocumentQuery();
+
+            if (SubscriptionsForTouchpointQuery == null)
+                return null;
+
+            var SubscriptionsForTouchpoint = await SubscriptionsForTouchpointQuery.ExecuteNextAsync<Models.Subscriptions>();
+
+            return SubscriptionsForTouchpoint?.FirstOrDefault();
+        }
+        
+
         public async Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions)
         {
             var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();

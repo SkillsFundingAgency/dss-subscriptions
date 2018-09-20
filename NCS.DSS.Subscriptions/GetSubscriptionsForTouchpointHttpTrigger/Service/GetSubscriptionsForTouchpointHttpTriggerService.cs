@@ -1,0 +1,17 @@
+﻿using System;
+using System.Threading.Tasks;
+using NCS.DSS.Subscriptions.Cosmos.Provider;
+
+namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Service
+{
+    public class GetSubscriptionsForTouchpointHttpTriggerService : IGetSubscriptionsForTouchpointHttpTriggerService
+    {
+        public async Task<Models.Subscriptions> GetSubscriptionsForTouchpointAsync(Guid customerId, string TouchpointId)
+        {
+            var documentDbProvider = new DocumentDBProvider();
+            var subscriptions = await documentDbProvider.GetSubscriptionsForTouchpointAsync(customerId, TouchpointId);
+
+            return subscriptions;
+        }
+    }
+}
