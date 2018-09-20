@@ -8,7 +8,7 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
 {
     public interface IDocumentDBProvider
     {
-        bool DoesCustomerResourceExist(Guid customerId);
+        Task<bool> DoesCustomerResourceExist(Guid customerId);
         bool DoesSubscriptionExist(Guid customerId, string touchpointId);
         Task<List<Models.Subscriptions>> SearchAllSubscriptions();
         Task<Models.Subscriptions> GetSubscriptionsForCustomerAsync(Guid? customerId, Guid? subscriptionId);
