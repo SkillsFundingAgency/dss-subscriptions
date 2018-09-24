@@ -34,20 +34,23 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
             return false;
         }
 
-        public bool DoesSubscriptionExist(Guid customerId, string touchpointId)
+        public async Task<Guid?> DoesSubscriptionExist(Guid customerId, string touchpointId)
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
             var client = DocumentDBClient.CreateDocumentClient();
 
-            if (client == null)
-                return false;
+            var subscriptionsByIdQuery = client?.CreateDocumentQuery<Models.Subscriptions>(collectionUri, new FeedOptions { MaxItemCount = 1 })
+                .Where(x => x.CustomerId == customerId &&
+                            x.TouchPointId == touchpointId &&
+                            x.Subscribe == true).AsDocumentQuery(); ;
 
-            var subscriptionQuery = client.CreateDocumentQuery<Models.Subscriptions>(collectionUri, new FeedOptions() { MaxItemCount = 1 });
-            return subscriptionQuery.Where(x => x.CustomerId == customerId && 
-                                                x.TouchPointId == touchpointId &&
-                                                x.Subscribe == true)
-                .Select(x => x.SubscriptionId).AsEnumerable().Any();
+            if (subscriptionsByIdQuery == null)
+                return null;
+
+            var subscription = await subscriptionsByIdQuery.ExecuteNextAsync<Models.Subscriptions>();
+
+            return subscription?.FirstOrDefault()?.SubscriptionId;
         }
 
         public async Task<List<Models.Subscriptions>> SearchAllSubscriptions()
