@@ -76,7 +76,10 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             var doesSubscriptionExist = await resourceHelper.DoesSubscriptionExist(customerGuid, touchpointId);
 
             if (doesSubscriptionExist.HasValue)
-                return HttpResponseMessageHelper.Conflict(doesSubscriptionExist.GetValueOrDefault());
+            {
+                var duplicateError = validate.ValidateResultForDuplicateSubscriptionId(doesSubscriptionExist.GetValueOrDefault());
+                return HttpResponseMessageHelper.Conflict(duplicateError);
+            }
 
             var subscriptions = await subscriptionsPostService.CreateAsync(subscriptionsRequest);
 

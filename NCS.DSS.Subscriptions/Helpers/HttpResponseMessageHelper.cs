@@ -77,11 +77,11 @@ namespace NCS.DSS.Subscriptions.Helpers
 
         #region Conflict(409)
 
-        public static HttpResponseMessage Conflict(Guid subscriptionId)
+        public static HttpResponseMessage Conflict(ValidationResult result)
         {
             return new HttpResponseMessage(HttpStatusCode.Conflict)
             {
-                Content = new StringContent("Duplicate Subscription Id: " + JsonConvert.SerializeObject(subscriptionId),
+                Content = new StringContent(JsonConvert.SerializeObject(result),
                     Encoding.UTF8, "application/json")
             };
         }

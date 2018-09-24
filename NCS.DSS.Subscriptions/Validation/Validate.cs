@@ -27,5 +27,10 @@ namespace NCS.DSS.Subscriptions.Validation
 
         }
 
+        public ValidationResult ValidateResultForDuplicateSubscriptionId(Guid subscriptionId)
+        {
+            return new ValidationResult("Duplicate SubscriptionId: " + subscriptionId , new[] {"SubscriptionId"});
+        }
+
     }
 }
