@@ -8,6 +8,6 @@ namespace NCS.DSS.Subscriptions.Validation
     public interface IValidate
     {
         List<ValidationResult> ValidateResource(ISubscription resource);
-        ValidationResult ValidateResultForDuplicateSubscriptionId(Guid subscriptionId);
+        SubscriptionError ValidateResultForDuplicateSubscriptionId(Guid subscriptionId);
     }
 }
