@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using NCS.DSS.Subscriptions.Validation;
 using Newtonsoft.Json;
 
 namespace NCS.DSS.Subscriptions.Helpers
@@ -77,11 +78,11 @@ namespace NCS.DSS.Subscriptions.Helpers
 
         #region Conflict(409)
 
-        public static HttpResponseMessage Conflict(ValidationResult result)
+        public static HttpResponseMessage Conflict(SubscriptionError error)
         {
             return new HttpResponseMessage(HttpStatusCode.Conflict)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(result),
+                Content = new StringContent(JsonConvert.SerializeObject(error),
                     Encoding.UTF8, "application/json")
             };
         }
