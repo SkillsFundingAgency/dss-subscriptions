@@ -1,27 +1,48 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web.Http.Description;
+using DFC.HTTP.Standard;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Subscriptions.Annotations;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.Helpers;
-using NCS.DSS.Subscriptions.Ioc;
 using NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Validation;
 using Newtonsoft.Json;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
 {
-    public static class PostSubscriptionsHttpTrigger
+    public class PostSubscriptionsHttpTrigger
     {
+        private readonly IResourceHelper _resourceHelper;
+        private readonly IHttpRequestHelper _httpRequestHelper;
+        private readonly IValidate _validate;
+        private readonly IPostSubscriptionsHttpTriggerService _subscriptionsPostService;
+        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
+
+        public PostSubscriptionsHttpTrigger(
+            IResourceHelper resourceHelper,
+            IHttpRequestHelper httpRequestMessageHelper,
+            IValidate validate,
+            IPostSubscriptionsHttpTriggerService subscriptionsPostService,
+            IHttpResponseMessageHelper httpResponseMessageHelper)
+        {
+            _resourceHelper = resourceHelper;
+            _httpRequestHelper = httpRequestMessageHelper;
+            _validate = validate;
+            _subscriptionsPostService = subscriptionsPostService;
+            _httpResponseMessageHelper = httpResponseMessageHelper;
+        }
+
         [FunctionName("Post")]
-        [ResponseType(typeof(Models.Subscriptions))]
+        [ProducesResponseType(typeof(Models.Subscriptions), (int)HttpStatusCode.Created)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Created, Description = "Subscriptions Created", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Subscriptions does not exist", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
@@ -29,63 +50,59 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Response(HttpStatusCode = 422, Description = "Subscriptions validation error(s)", ShowSchema = false)]
         [Display(Name = "Post", Description = "Ability to create a new subscriptions for a given customer")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId}/Subscriptions")]HttpRequestMessage req, ILogger log, string customerId,
-            [Inject]IResourceHelper resourceHelper,
-            [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
-            [Inject]IValidate validate,
-            [Inject]IPostSubscriptionsHttpTriggerService subscriptionsPostService)
+        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId}/Subscriptions")] HttpRequest req, ILogger log, string customerId)
         {
-            var touchpointId = httpRequestMessageHelper.GetTouchpointId(req);
+            var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
                 log.LogInformation("Unable to locate 'TouchpointId' in request header");
-                return HttpResponseMessageHelper.BadRequest();
+                return _httpResponseMessageHelper.BadRequest();
             }
 
             log.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
-                return HttpResponseMessageHelper.BadRequest(customerGuid);
+                return _httpResponseMessageHelper.BadRequest(customerGuid);
 
             Models.Subscriptions subscriptionsRequest;
 
             try
             {
-                subscriptionsRequest = await httpRequestMessageHelper.GetSubscriptionsFromRequest<Models.Subscriptions>(req);
+                subscriptionsRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Subscriptions>(req);
             }
             catch (JsonSerializationException ex)
             {
-                return HttpResponseMessageHelper.UnprocessableEntity(ex);
+                return _httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (subscriptionsRequest == null)
-                return HttpResponseMessageHelper.UnprocessableEntity(req);
+                return _httpResponseMessageHelper.UnprocessableEntity(req);
 
             subscriptionsRequest.SetIds(customerGuid, touchpointId);
 
-            var errors = validate.ValidateResource(subscriptionsRequest);
+            var errors = _validate.ValidateResource(subscriptionsRequest);
 
             if (errors != null && errors.Any())
-                return HttpResponseMessageHelper.UnprocessableEntity(errors);
+                return _httpResponseMessageHelper.UnprocessableEntity(errors);
 
-            var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
+            var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
-                return HttpResponseMessageHelper.NoContent(customerGuid);
+                return _httpResponseMessageHelper.NoContent(customerGuid);
 
-            var doesSubscriptionExist = await resourceHelper.DoesSubscriptionExist(customerGuid, touchpointId);
+            var doesSubscriptionExist = await _resourceHelper.DoesSubscriptionExist(customerGuid, touchpointId);
 
             if (doesSubscriptionExist.HasValue)
             {
-                var duplicateError = validate.ValidateResultForDuplicateSubscriptionId(doesSubscriptionExist.GetValueOrDefault());
-                return HttpResponseMessageHelper.Conflict(duplicateError);
+                var duplicateError = _validate.ValidateResultForDuplicateSubscriptionId(doesSubscriptionExist.GetValueOrDefault());
+                return _httpResponseMessageHelper.Conflict();
             }
 
-            var subscriptions = await subscriptionsPostService.CreateAsync(subscriptionsRequest);
+            var subscriptions = await _subscriptionsPostService.CreateAsync(subscriptionsRequest);
 
             return subscriptions == null
-                ? HttpResponseMessageHelper.BadRequest(customerGuid)
-                : HttpResponseMessageHelper.Created(JsonHelper.SerializeObject(subscriptions));
+                ? _httpResponseMessageHelper.BadRequest(customerGuid)
+                : _httpResponseMessageHelper.Created(JsonHelper.SerializeObject(subscriptions));
         }
     }
 }
