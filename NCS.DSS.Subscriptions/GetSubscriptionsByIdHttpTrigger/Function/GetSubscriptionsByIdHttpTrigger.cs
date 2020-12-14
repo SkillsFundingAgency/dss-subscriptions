@@ -1,9 +1,10 @@
 using DFC.HTTP.Standard;
+using DFC.Swagger.Standard.Annotations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-using NCS.DSS.Subscriptions.Annotations;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Helpers;
@@ -37,7 +38,7 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Display(Name = "Get", Description = "Ability to retrieve a single subscriptions with a given SubscriptionsId for an individual customer.")]
         [Disable]
-        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Subscriptions/{subscriptionId}")]HttpRequestMessage req, TraceWriter log, string customerId, string subscriptionId)
+        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Subscriptions/{subscriptionId}")]HttpRequest req, TraceWriter log, string customerId, string subscriptionId)
         {
             log.Info("C# HTTP trigger function processed a request.");
 

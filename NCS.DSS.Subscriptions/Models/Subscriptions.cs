@@ -1,4 +1,4 @@
-﻿using NCS.DSS.Subscriptions.Annotations;
+﻿using DFC.Swagger.Standard.Annotations;
 using System;
 using System.ComponentModel.DataAnnotations;
 

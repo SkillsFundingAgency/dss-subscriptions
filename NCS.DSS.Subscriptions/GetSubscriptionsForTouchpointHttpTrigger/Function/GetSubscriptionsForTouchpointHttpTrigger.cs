@@ -1,19 +1,18 @@
-using System;
-using System.ComponentModel.DataAnnotations;
+using DFC.HTTP.Standard;
+using DFC.Swagger.Standard.Annotations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
-using System.Net.Http;
-using System.Net;
-using System.Threading.Tasks;
-using NCS.DSS.Subscriptions.Annotations;
+using Microsoft.Extensions.Logging;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Helpers;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc;
-using DFC.HTTP.Standard;
-using Microsoft.AspNetCore.Http;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Function
 {
