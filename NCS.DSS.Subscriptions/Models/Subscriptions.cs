@@ -1,4 +1,4 @@
-﻿using NCS.DSS.Subscriptions.Annotations;
+﻿using DFC.Swagger.Standard.Annotations;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,7 +21,7 @@ namespace NCS.DSS.Subscriptions.Models
         public string TouchPointId { get; set; }
 
         [Display(Description = "Indicator to register an interest in changes to the given customer record.  true indicates subscribe, false is unsubscribe")]
-        [Example(Description = "true/false")]
+        [Example(Description = "true")]
         public bool? Subscribe { get; set; }
 
         [Display(Description = "Last modified date & time")]
