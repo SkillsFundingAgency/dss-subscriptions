@@ -20,6 +20,11 @@ namespace NCS.DSS.Subscriptions.Models
         [Example(Description = "0000000001")]
         public string TouchPointId { get; set; }
 
+        [StringLength(10, MinimumLength = 10)]
+        [Display(Description = "Identifier of the subcontractor who made the last change to the record")]
+        [Example(Description = "9999999999")]
+        public string SubcontractorId { get; set; }
+
         [Display(Description = "Indicator to register an interest in changes to the given customer record.  true indicates subscribe, false is unsubscribe")]
         [Example(Description = "true/false")]
         public bool? Subscribe { get; set; }
@@ -40,12 +45,13 @@ namespace NCS.DSS.Subscriptions.Models
                 LastModifiedDate = DateTime.UtcNow;
         }
 
-        public void SetIds(Guid customerId, string touchpointId)
+        public void SetIds(Guid customerId, string touchpointId, string subcontractorId)
         {
             SubscriptionId = Guid.NewGuid();
             CustomerId = customerId;
             TouchPointId = touchpointId;
             LastModifiedBy = touchpointId;
+            SubcontractorId = subcontractorId; 
         }
 
         public void Patch(SubscriptionsPatch subscriptionsPatch)

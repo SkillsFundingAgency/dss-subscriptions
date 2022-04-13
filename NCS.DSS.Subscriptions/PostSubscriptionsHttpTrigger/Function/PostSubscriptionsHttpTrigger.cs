@@ -42,7 +42,14 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
                 return HttpResponseMessageHelper.BadRequest();
             }
 
-            log.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
+            var subcontractorId = httpRequestMessageHelper.GetSubcontractorId(req);
+            if (string.IsNullOrEmpty(subcontractorId))
+            {
+                log.LogInformation("Unable to locate 'SubcontractorId' in request header");
+                return HttpResponseMessageHelper.BadRequest();
+            }
+
+            log.LogInformation($"C# HTTP trigger function processed a request. By Touchpoint {touchpointId} and SubcontractorId {subcontractorId}");
 
             if (!Guid.TryParse(customerId, out var customerGuid))
                 return HttpResponseMessageHelper.BadRequest(customerGuid);
@@ -61,7 +68,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             if (subscriptionsRequest == null)
                 return HttpResponseMessageHelper.UnprocessableEntity(req);
 
-            subscriptionsRequest.SetIds(customerGuid, touchpointId);
+            subscriptionsRequest.SetIds(customerGuid, touchpointId, subcontractorId);
 
             var errors = validate.ValidateResource(subscriptionsRequest);
 
@@ -73,7 +80,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             if (!doesCustomerExist)
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
-            var doesSubscriptionExist = await resourceHelper.DoesSubscriptionExist(customerGuid, touchpointId);
+            var doesSubscriptionExist = await resourceHelper.DoesSubscriptionExist(customerGuid, touchpointId, subcontractorId);
 
             if (doesSubscriptionExist.HasValue)
             {

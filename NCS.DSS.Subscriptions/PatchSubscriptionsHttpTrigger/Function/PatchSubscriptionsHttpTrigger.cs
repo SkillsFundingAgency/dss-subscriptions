@@ -43,7 +43,14 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
                 return HttpResponseMessageHelper.BadRequest();
             }
 
-            log.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
+            var subcontractorId = httpRequestMessageHelper.GetSubcontractorId(req);
+            if (string.IsNullOrEmpty(subcontractorId))
+            {
+                log.LogInformation("Unable to locate 'SubcontractorId' in request header");
+                return HttpResponseMessageHelper.BadRequest();
+            }
+
+            log.LogInformation($"C# HTTP trigger function processed a request. By Touchpoint {touchpointId} and session id {subcontractorId}");
 
             if (!Guid.TryParse(customerId, out var customerGuid))
                 return HttpResponseMessageHelper.BadRequest(customerGuid);

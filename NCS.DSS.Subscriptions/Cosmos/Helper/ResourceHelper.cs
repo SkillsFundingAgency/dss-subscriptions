@@ -14,10 +14,10 @@ namespace NCS.DSS.Subscriptions.Cosmos.Helper
             return doesCustomerExist;
         }
 
-        public async Task<Guid?> DoesSubscriptionExist(Guid customerId, string touchpointId)
+        public async Task<Guid?> DoesSubscriptionExist(Guid customerId, string touchpointId, string subcontractorId)
         {
             var documentDbProvider = new DocumentDBProvider();
-            var doesSubscriptionExist = await documentDbProvider.DoesSubscriptionExist(customerId, touchpointId);
+            var doesSubscriptionExist = await documentDbProvider.DoesSubscriptionExist(customerId, touchpointId, subcontractorId);
 
             return doesSubscriptionExist;
         }

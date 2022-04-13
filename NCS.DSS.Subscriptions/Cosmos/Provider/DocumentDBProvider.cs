@@ -34,7 +34,7 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
             return false;
         }
 
-        public async Task<Guid?> DoesSubscriptionExist(Guid customerId, string touchpointId)
+        public async Task<Guid?> DoesSubscriptionExist(Guid customerId, string touchpointId, string subcontractorId)
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
@@ -43,6 +43,7 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
             var subscriptionsByIdQuery = client?.CreateDocumentQuery<Models.Subscriptions>(collectionUri, new FeedOptions { MaxItemCount = 1 })
                 .Where(x => x.CustomerId == customerId &&
                             x.TouchPointId == touchpointId &&
+                            x.SubcontractorId == subcontractorId &&
                             x.Subscribe == true).AsDocumentQuery(); ;
 
             if (subscriptionsByIdQuery == null)
@@ -97,7 +98,7 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
         }
 
 
-        public async Task<List<Models.Subscriptions>> GetSubscriptionsForTouchpointAsync(Guid? customerId, string touchpointId)
+        public async Task<List<Models.Subscriptions>> GetSubscriptionsForTouchpointAsync(Guid? customerId, string touchpointId, string subcontractorId)
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
@@ -105,7 +106,7 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
 
             var subscriptionsForTouchpointQuery = client
                 ?.CreateDocumentQuery<Models.Subscriptions>(collectionUri)
-                .Where(x => x.CustomerId == customerId && x.TouchPointId == touchpointId)
+                .Where(x => x.CustomerId == customerId && x.TouchPointId == touchpointId && x.SubcontractorId == subcontractorId)
                 .AsDocumentQuery();
 
             if (subscriptionsForTouchpointQuery == null)

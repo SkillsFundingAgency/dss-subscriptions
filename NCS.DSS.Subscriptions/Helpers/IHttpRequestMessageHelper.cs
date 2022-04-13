@@ -8,5 +8,7 @@ namespace NCS.DSS.Subscriptions.Helpers
     {
         Task<T> GetSubscriptionsFromRequest<T>(HttpRequestMessage req);
         string GetTouchpointId(HttpRequestMessage req);
+        string GetSubcontractorId(HttpRequestMessage req);
+
     }
 }
