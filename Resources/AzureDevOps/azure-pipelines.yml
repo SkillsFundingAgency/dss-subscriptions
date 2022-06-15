@@ -16,7 +16,7 @@ jobs:
 # Test the branch name, the output of this job will satisfy the condition of one or neither of the subsequent jobs
 - job: TestBranchName
   displayName: TestBranchName
-   pool:
+  pool:
     name: NCS - CI and CD
     demands:
     - msbuild
