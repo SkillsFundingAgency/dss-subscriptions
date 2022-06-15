@@ -42,8 +42,9 @@ jobs:
   displayName: Build-DotNetFramework
   dependsOn: TestBranchName
   condition: and(succeeded(), eq(dependencies.TestBranchName.outputs['ExecuteTestBranchNameScript.FunctionAppVersion'], 'Version1'))
+
   pool:
-    name: Continuous Integration 02 - SSD - 160ACU
+    name: NCS - CI and CD
     demands:
     - msbuild
     - visualstudio
