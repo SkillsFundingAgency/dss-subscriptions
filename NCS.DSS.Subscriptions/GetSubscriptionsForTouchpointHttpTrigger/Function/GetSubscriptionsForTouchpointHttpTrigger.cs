@@ -51,7 +51,14 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
                 log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
                 return _httpResponseMessageHelper.BadRequest();
             }
-            
+
+            var subcontractorId = _httpRequestMessageHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subcontractorId))
+            {
+                log.LogInformation("Unable to locate 'APIM-subcontractorId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
+            }
+
             if (!Guid.TryParse(customerId, out var customerGuid))
                 return _httpResponseMessageHelper.BadRequest(customerGuid);
             

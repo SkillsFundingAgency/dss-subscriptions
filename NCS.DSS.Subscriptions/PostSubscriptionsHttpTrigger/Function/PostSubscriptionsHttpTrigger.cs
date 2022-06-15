@@ -59,6 +59,13 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
                 return _httpResponseMessageHelper.BadRequest();
             }
 
+            var subcontractorId = _httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subcontractorId))
+            {
+                log.LogInformation("Unable to locate 'APIM-subcontractorId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
+            }
+
             log.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
