@@ -56,17 +56,23 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
             var touchpointId = _httpRequestMessageHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                log.LogInformation("Unable to locate 'TouchpointId' in request header");
+                log.LogInformation($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} Unable to locate 'TouchpointId' in request header");
                 return _httpResponseMessageHelper.BadRequest();
             }
 
             log.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
+            {
+                log.LogInformation($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} BadRequest CustomerId");
                 return _httpResponseMessageHelper.BadRequest(customerGuid);
+            }
 
             if (!Guid.TryParse(subscriptionId, out var subscriptionsGuid))
+            {
+                log.LogInformation($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} BadRequest subscriptionId");
                 return _httpResponseMessageHelper.BadRequest(subscriptionsGuid);
+            }
 
             SubscriptionsPatch subscriptionsPatchRequest;
 
@@ -76,30 +82,45 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
             }
             catch (JsonSerializationException ex)
             {
+                log.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} exception {ex.Message}");
                 return _httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (subscriptionsPatchRequest == null)
+            {
+                log.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} subscriptionsPatchRequest is null");
                 return _httpResponseMessageHelper.UnprocessableEntity(req);
+            }
 
             subscriptionsPatchRequest.LastModifiedBy = touchpointId;
            
             var errors = _validate.ValidateResource(subscriptionsPatchRequest);
 
             if (errors != null && errors.Any())
+            {
+                log.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} errors at ValidateResource ");
                 return _httpResponseMessageHelper.UnprocessableEntity(errors);
+            }
            
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
+            {
+                log.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} customer doesCustomerExist ");
                 return _httpResponseMessageHelper.NoContent(customerGuid);
+            }
            
             var subscriptions = await _subscriptionsPatchService.GetSubscriptionsForCustomerAsync(customerGuid, subscriptionsGuid);
 
             if (subscriptions == null)
+            {
+                log.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} subscriptions  is null ");
                 return _httpResponseMessageHelper.NoContent(subscriptionsGuid);
+            }
 
            var updatedSubscriptions = await _subscriptionsPatchService.UpdateAsync(subscriptions, subscriptionsPatchRequest);
+            log.LogInformation($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} updatedSubscriptions");
+
 
             return updatedSubscriptions == null ?
                 _httpResponseMessageHelper.BadRequest(subscriptionsGuid) :

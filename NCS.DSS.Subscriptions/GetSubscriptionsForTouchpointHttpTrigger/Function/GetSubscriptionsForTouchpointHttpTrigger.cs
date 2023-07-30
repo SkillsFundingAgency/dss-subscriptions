@@ -51,11 +51,15 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
                 log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
                 return _httpResponseMessageHelper.BadRequest();
             }
-            
+
             if (!Guid.TryParse(customerId, out var customerGuid))
+            {
+                log.LogWarning($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions/ BadRequest");
                 return _httpResponseMessageHelper.BadRequest(customerGuid);
+            }
             
             var subscriptions = await _getSubscriptionsForTouchpointService.GetSubscriptionsForTouchpointAsync(customerGuid, touchpointId);
+            log.LogInformation($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions");
 
             return subscriptions == null ?
                 _httpResponseMessageHelper.NoContent(customerGuid) :
