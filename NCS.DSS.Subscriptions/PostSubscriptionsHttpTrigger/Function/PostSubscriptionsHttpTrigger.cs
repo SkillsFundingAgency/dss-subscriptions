@@ -55,14 +55,17 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                log.LogInformation("Unable to locate 'TouchpointId' in request header");
+                log.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions Unable to locate 'TouchpointId' in request header");
                 return _httpResponseMessageHelper.BadRequest();
             }
 
             log.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
+            {
+                log.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions customerGuid BadRequest");
                 return _httpResponseMessageHelper.BadRequest(customerGuid);
+            }
 
             Models.Subscriptions subscriptionsRequest;
 
@@ -72,33 +75,46 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             }
             catch (JsonSerializationException ex)
             {
+                log.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions JsonSerializationException");
                 return _httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (subscriptionsRequest == null)
+            {
+                log.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions subscriptionsRequest is null");
                 return _httpResponseMessageHelper.UnprocessableEntity(req);
+            }
 
             subscriptionsRequest.SetIds(customerGuid, touchpointId);
 
             var errors = _validate.ValidateResource(subscriptionsRequest);
 
             if (errors != null && errors.Any())
+            {
+                log.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions errors in ValidateResource");
                 return _httpResponseMessageHelper.UnprocessableEntity(errors);
+            }
 
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
+            {
+                log.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions does notvCustomerExist ");
                 return _httpResponseMessageHelper.NoContent(customerGuid);
+            }
 
             var doesSubscriptionExist = await _resourceHelper.DoesSubscriptionExist(customerGuid, touchpointId);
 
             if (doesSubscriptionExist.HasValue)
             {
                 var duplicateError = _validate.ValidateResultForDuplicateSubscriptionId(doesSubscriptionExist.GetValueOrDefault());
+                log.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions Subscription conflict ");
                 return _httpResponseMessageHelper.Conflict();
             }
 
             var subscriptions = await _subscriptionsPostService.CreateAsync(subscriptionsRequest);
+
+            log.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions CreateAsync called");
 
             return subscriptions == null
                 ? _httpResponseMessageHelper.BadRequest(customerGuid)
