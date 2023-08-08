@@ -2,9 +2,11 @@ using DFC.HTTP.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Amqp.Framing;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Helpers;
@@ -38,22 +40,32 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Display(Name = "Get", Description = "Ability to retrieve a single subscriptions with a given SubscriptionsId for an individual customer.")]
         [Disable]
-        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Subscriptions/{subscriptionId}")]HttpRequest req, TraceWriter log, string customerId, string subscriptionId)
+        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Subscriptions/{subscriptionId}")]HttpRequest req, ILogger log, string customerId, string subscriptionId)
         {
-            log.Info("C# HTTP trigger function processed a request.");
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
             if (!Guid.TryParse(customerId, out var customerGuid))
+            {
+                log.LogWarning($"GetSubscriptionsByIdHttpTrigger customerId {customerId} BadRequest");
                 return _httpResponseMessageHelper.BadRequest(customerGuid);
+            }
 
             if (!Guid.TryParse(subscriptionId, out var subscriptionsGuid))
+            {
+                log.LogWarning($"GetSubscriptionsByIdHttpTrigger subscriptionId {subscriptionId} BadRequest");
                 return _httpResponseMessageHelper.BadRequest(subscriptionsGuid);
+            } 
 
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
+            {
+                log.LogWarning($"GetSubscriptionsByIdHttpTrigger customerGuid {customerGuid} NoContent");
                 return _httpResponseMessageHelper.NoContent(customerGuid);
+            }
 
             var subscriptions = await _getSubscriptionsByIdService.GetSubscriptionsForCustomerAsync(customerGuid, subscriptionsGuid);
+            log.LogInformation($"GetSubscriptionsByIdHttpTrigger _getSubscriptionsByIdService customerGuid {customerGuid} subscriptionsGuid {subscriptionsGuid}");
 
             return subscriptions == null ?
                 _httpResponseMessageHelper.NoContent(subscriptionsGuid) :
