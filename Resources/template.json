@@ -34,6 +34,12 @@
     },
     "workspaceResourceGroup": {
       "type": "string"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "storageAccountKey": {
+      "type": "string"
     }
   },
     "variables": {
@@ -75,6 +81,12 @@
                 },
                 "workspaceId": {
                   "value": "[resourceId(parameters('workspaceResourceGroup'), 'Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+                },
+                "storageAccountKey": {
+                  "value": "[parameters('storageAccountKey')]"
+                },
+                "storageAccountName": {
+                  "value": "[parameters('storageAccountName')]"
                 }
               }
             },
