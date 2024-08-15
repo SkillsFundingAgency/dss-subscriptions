@@ -25,6 +25,12 @@
     },
     "workspaceId": {
       "type": "string"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "storageAccountKey": {
+      "type": "string"
     }
   },
   "variables": {
