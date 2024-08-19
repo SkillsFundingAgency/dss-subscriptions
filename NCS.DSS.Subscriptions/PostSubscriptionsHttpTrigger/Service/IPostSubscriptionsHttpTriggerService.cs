@@ -1,4 +1,7 @@
-﻿namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
+﻿using System;
+using System.Threading.Tasks;
+
+namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
 {
     public interface IPostSubscriptionsHttpTriggerService
     {

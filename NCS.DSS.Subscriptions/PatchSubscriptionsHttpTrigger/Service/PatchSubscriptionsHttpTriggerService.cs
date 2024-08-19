@@ -1,10 +1,12 @@
-﻿using NCS.DSS.Subscriptions.Cosmos.Provider;
+﻿using System;
 using System.Net;
+using System.Threading.Tasks;
+using NCS.DSS.Subscriptions.Cosmos.Provider;
 
 namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service
 {
     public class PatchSubscriptionsHttpTriggerService : IPatchSubscriptionsHttpTriggerService
-    {
+    {       
         public async Task<Models.Subscriptions> UpdateAsync(Models.Subscriptions subscriptions, Models.SubscriptionsPatch subscriptionsPatch)
         {
             if (subscriptions == null)
@@ -27,7 +29,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service
         {
             var documentDbProvider = new DocumentDBProvider();
             var subscriptions = await documentDbProvider.GetSubscriptionsForCustomerAsync(customerId, subscriptionId);
-
+            
             return subscriptions;
         }
     }

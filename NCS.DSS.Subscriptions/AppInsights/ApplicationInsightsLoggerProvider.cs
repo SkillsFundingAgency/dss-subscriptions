@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using NCS.DSS.Subscriptions.AppInsights;
+using System;
 
 namespace ApplicationInsightsLogging
 {

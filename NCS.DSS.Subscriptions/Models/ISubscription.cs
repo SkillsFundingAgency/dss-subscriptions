@@ -1,4 +1,6 @@
-﻿namespace NCS.DSS.Subscriptions.Models
+﻿using System;
+
+namespace NCS.DSS.Subscriptions.Models
 {
     public interface ISubscription
     {
@@ -9,3 +11,4 @@
         void SetDefaultValues();
     }
 }
+ 

@@ -1,4 +1,7 @@
-﻿namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service
+﻿using System;
+using System.Threading.Tasks;
+
+namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service
 {
     public interface IPatchSubscriptionsHttpTriggerService
     {

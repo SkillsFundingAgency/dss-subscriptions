@@ -1,4 +1,8 @@
-﻿using Microsoft.Azure.Documents;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using NCS.DSS.Subscriptions.Cosmos.Client;
@@ -117,7 +121,7 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
 
             return subscriptions.Any() ? subscriptions : null;
         }
-
+        
 
         public async Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions)
         {

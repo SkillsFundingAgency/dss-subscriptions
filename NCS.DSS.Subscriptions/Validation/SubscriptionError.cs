@@ -1,4 +1,6 @@
-﻿namespace NCS.DSS.Subscriptions.Validation
+﻿using System;
+
+namespace NCS.DSS.Subscriptions.Validation
 {
     public class SubscriptionError
     {

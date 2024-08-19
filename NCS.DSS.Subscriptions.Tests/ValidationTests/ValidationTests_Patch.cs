@@ -1,10 +1,11 @@
 ﻿using NCS.DSS.Subscriptions.Validation;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace NCS.DSS.Subscriptions.Tests.ValidationTests
 {
     [TestFixture]
-    public class ValidationTests_Patch
+    public  class ValidationTests_Patch
     {
         private IValidate _validate;
 

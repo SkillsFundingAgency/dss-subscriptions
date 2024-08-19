@@ -2,16 +2,19 @@ using DFC.HTTP.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
-using NCS.DSS.Subscriptions.Helpers;
 using NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Validation;
 using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+using Microsoft.Azure.Functions.Worker;
 using System.Text.Json;
+using NCS.DSS.Subscriptions.Helpers;
 
 namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
 {
@@ -49,7 +52,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Response(HttpStatusCode = 422, Description = "Subscriptions validation error(s)", ShowSchema = false)]
         [Display(Name = "Post", Description = "Ability to create a new subscriptions for a given customer")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId}/Subscriptions")] HttpRequest req, string customerId)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId}/Subscriptions")] HttpRequest req,string customerId)
         {
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
@@ -117,7 +120,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
 
             return subscriptions == null
                 ? new BadRequestObjectResult(customerGuid)
-                : new JsonResult(subscriptions, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.Created };
+                : new JsonResult(subscriptions, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.Created};
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DFC.Swagger.Standard.Annotations;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Subscriptions.Models
@@ -58,7 +59,7 @@ namespace NCS.DSS.Subscriptions.Models
                 this.Subscribe = subscriptionsPatch.Subscribe;
 
             if (subscriptionsPatch.LastModifiedDate != null)
-                this.LastModifiedDate = subscriptionsPatch.LastModifiedDate;
+                this.LastModifiedDate= subscriptionsPatch.LastModifiedDate;
 
             if (!string.IsNullOrEmpty(subscriptionsPatch.LastModifiedBy))
                 this.LastModifiedBy = subscriptionsPatch.LastModifiedBy;

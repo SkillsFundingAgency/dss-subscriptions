@@ -12,7 +12,7 @@ using NCS.DSS.Subscriptions.Validation;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
-    .ConfigureServices(services =>
+    .ConfigureServices( services =>
     {
         services.AddTransient<IGetSubscriptionsForTouchpointHttpTriggerService, GetSubscriptionsForTouchpointHttpTriggerService>();
         services.AddTransient<IGetSubscriptionsByIdHttpTriggerService, GetSubscriptionsByIdHttpTriggerService>();
