@@ -1,7 +1,5 @@
-﻿using System;
+﻿using NCS.DSS.Subscriptions.Cosmos.Provider;
 using System.Net;
-using System.Threading.Tasks;
-using NCS.DSS.Subscriptions.Cosmos.Provider;
 
 namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
 {
@@ -11,7 +9,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
         {
             if (subscriptions == null)
                 return null;
-          
+
             var subscriptionId = Guid.NewGuid();
             subscriptions.SubscriptionId = subscriptionId;
 
@@ -22,7 +20,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
 
             var response = await documentDbProvider.CreateSubscriptionsAsync(subscriptions);
 
-            return response.StatusCode == HttpStatusCode.Created ? (dynamic) response.Resource : (Guid?) null;
+            return response.StatusCode == HttpStatusCode.Created ? (dynamic)response.Resource : (Guid?)null;
         }
     }
 }

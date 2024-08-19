@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using NCS.DSS.Subscriptions.Cosmos.Provider;
+﻿using NCS.DSS.Subscriptions.Cosmos.Provider;
 
 namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Service
 {

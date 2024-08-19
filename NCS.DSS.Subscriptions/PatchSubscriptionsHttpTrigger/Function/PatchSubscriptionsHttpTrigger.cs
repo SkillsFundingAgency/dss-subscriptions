@@ -2,6 +2,7 @@ using DFC.HTTP.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.Helpers;
@@ -9,12 +10,8 @@ using NCS.DSS.Subscriptions.Models;
 using NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Validation;
 using Newtonsoft.Json;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
 using System.Text.Json;
 
 namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
@@ -94,7 +91,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
             }
 
             subscriptionsPatchRequest.LastModifiedBy = touchpointId;
-           
+
             var errors = _validate.ValidateResource(subscriptionsPatchRequest);
 
             if (errors != null && errors.Any())
@@ -102,7 +99,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
                 _loggerHelper.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} errors at ValidateResource ");
                 return new UnprocessableEntityObjectResult(errors);
             }
-           
+
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
@@ -110,7 +107,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
                 _loggerHelper.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} customer doesCustomerExist ");
                 return new NoContentResult();
             }
-           
+
             var subscriptions = await _subscriptionsPatchService.GetSubscriptionsForCustomerAsync(customerGuid, subscriptionsGuid);
 
             if (subscriptions == null)
@@ -119,7 +116,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
                 return new NoContentResult();
             }
 
-           var updatedSubscriptions = await _subscriptionsPatchService.UpdateAsync(subscriptions, subscriptionsPatchRequest);
+            var updatedSubscriptions = await _subscriptionsPatchService.UpdateAsync(subscriptions, subscriptionsPatchRequest);
             _loggerHelper.LogInformation($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} updatedSubscriptions");
 
 

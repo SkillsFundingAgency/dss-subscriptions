@@ -1,18 +1,6 @@
 using DFC.HTTP.Standard;
-using DFC.Swagger.Standard.Annotations;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Amqp.Framing;
-using Microsoft.Extensions.Logging;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Service;
-using NCS.DSS.Subscriptions.Helpers;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
 
 namespace NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Function
 {
