@@ -29,8 +29,8 @@ namespace NCS.DSS.Subscriptions.Tests.ValidationTests
 
             var result = _validate.ValidateResource(transfer);
 
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(1));
         }
 
@@ -44,8 +44,8 @@ namespace NCS.DSS.Subscriptions.Tests.ValidationTests
 
             var result = _validate.ValidateResource(transfer);
 
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(0));
         }
 
@@ -60,8 +60,8 @@ namespace NCS.DSS.Subscriptions.Tests.ValidationTests
 
             var result = _validate.ValidateResource(transfer);
 
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
         }
 
@@ -76,8 +76,8 @@ namespace NCS.DSS.Subscriptions.Tests.ValidationTests
 
             var result = _validate.ValidateResource(transfer);
 
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(0));
         }
     }

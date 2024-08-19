@@ -1,11 +1,11 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCS.DSS.Subscriptions", "NCS.DSS.Subscriptions\NCS.DSS.Subscriptions.csproj", "{82A40DAD-1335-4E8B-818C-A93296F4FD9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCS.DSS.Subscriptions.Tests", "NCS.DSS.Subscriptions.Tests\NCS.DSS.Subscriptions.Tests.csproj", "{4624FE08-67BA-4C9D-8E90-958C9F50B572}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCS.DSS.Subscriptions.Tests", "NCS.DSS.Subscriptions.Tests\NCS.DSS.Subscriptions.Tests.csproj", "{4624FE08-67BA-4C9D-8E90-958C9F50B572}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
