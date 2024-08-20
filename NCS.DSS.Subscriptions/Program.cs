@@ -3,6 +3,7 @@ using DFC.Swagger.Standard;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
+using NCS.DSS.Subscriptions.Cosmos.Provider;
 using NCS.DSS.Subscriptions.GetSubscriptionsByIdHttpTrigger.Service;
 using NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Helpers;
@@ -19,6 +20,7 @@ var host = new HostBuilder()
         services.AddTransient<IPostSubscriptionsHttpTriggerService, PostSubscriptionsHttpTriggerService>();
         services.AddTransient<IPatchSubscriptionsHttpTriggerService, PatchSubscriptionsHttpTriggerService>();
         services.AddSingleton<IConvertToDynamic, ConvertToDynamic>();
+        services.AddSingleton<IDocumentDBProvider, DocumentDBProvider>();
         services.AddTransient<IResourceHelper, ResourceHelper>();
         services.AddTransient<IValidate, Validate>();
         services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
