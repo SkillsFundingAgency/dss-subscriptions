@@ -57,9 +57,15 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
             var subscriptions = await _getSubscriptionsForTouchpointService.GetSubscriptionsForTouchpointAsync(customerGuid, touchpointId);
             _loggerHelper.LogInformation($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions");
 
-            return subscriptions == null ?
-                new NoContentResult() :
-                new JsonResult(subscriptions, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
+            if (subscriptions == null)
+            {
+                _loggerHelper.LogWarning($"Subscriptions not found for customer id [{customerId}]");
+                return new NoContentResult();
+            }               
+            else if (subscriptions.Count == 1)
+                return new JsonResult(subscriptions[0], new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
+
+            return new JsonResult(subscriptions, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
         }
     }
 }

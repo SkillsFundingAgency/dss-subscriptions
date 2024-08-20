@@ -5,6 +5,10 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
 {
     public class PostSubscriptionsHttpTriggerService : IPostSubscriptionsHttpTriggerService
     {
+        private readonly IDocumentDBProvider _documentDbProvider;
+        public PostSubscriptionsHttpTriggerService(IDocumentDBProvider documentDbProvider) {
+            _documentDbProvider = documentDbProvider;
+        }    
         public async Task<Models.Subscriptions> CreateAsync(Models.Subscriptions subscriptions)
         {
             if (subscriptions == null)
@@ -16,9 +20,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
             if (!subscriptions.LastModifiedDate.HasValue)
                 subscriptions.LastModifiedDate = DateTime.Now;
 
-            var documentDbProvider = new DocumentDBProvider();
-
-            var response = await documentDbProvider.CreateSubscriptionsAsync(subscriptions);
+            var response = await _documentDbProvider.CreateSubscriptionsAsync(subscriptions);
 
             return response.StatusCode == HttpStatusCode.Created ? (dynamic)response.Resource : (Guid?)null;
         }

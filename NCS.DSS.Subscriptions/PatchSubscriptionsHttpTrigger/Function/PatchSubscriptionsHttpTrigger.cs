@@ -9,7 +9,6 @@ using NCS.DSS.Subscriptions.Helpers;
 using NCS.DSS.Subscriptions.Models;
 using NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Validation;
-using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
@@ -78,7 +77,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
             {
                 subscriptionsPatchRequest = await _httpRequestMessageHelper.GetResourceFromRequest<SubscriptionsPatch>(req);
             }
-            catch (JsonSerializationException ex)
+            catch (Exception ex)
             {
                 _loggerHelper.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} exception {ex.Message}");
                 return new UnprocessableEntityObjectResult(_convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException"]));

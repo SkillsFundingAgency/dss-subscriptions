@@ -8,7 +8,6 @@ using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.Helpers;
 using NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Validation;
-using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
@@ -72,7 +71,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             {
                 subscriptionsRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Subscriptions>(req);
             }
-            catch (JsonSerializationException ex)
+            catch (Exception ex)
             {
                 _loggerHelper.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions JsonSerializationException");
                 return new UnprocessableEntityObjectResult(_convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException"]));
