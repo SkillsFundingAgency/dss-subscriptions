@@ -6,7 +6,8 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service
     public class PatchSubscriptionsHttpTriggerService : IPatchSubscriptionsHttpTriggerService
     {
         private readonly IDocumentDBProvider _documentDbProvider;
-        public PatchSubscriptionsHttpTriggerService(IDocumentDBProvider documentDbProvider) { 
+        public PatchSubscriptionsHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        {
             _documentDbProvider = documentDbProvider;
         }
         public async Task<Models.Subscriptions> UpdateAsync(Models.Subscriptions subscriptions, Models.SubscriptionsPatch subscriptionsPatch)

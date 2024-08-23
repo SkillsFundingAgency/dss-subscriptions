@@ -6,9 +6,10 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
     public class PostSubscriptionsHttpTriggerService : IPostSubscriptionsHttpTriggerService
     {
         private readonly IDocumentDBProvider _documentDbProvider;
-        public PostSubscriptionsHttpTriggerService(IDocumentDBProvider documentDbProvider) {
+        public PostSubscriptionsHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        {
             _documentDbProvider = documentDbProvider;
-        }    
+        }
         public async Task<Models.Subscriptions> CreateAsync(Models.Subscriptions subscriptions)
         {
             if (subscriptions == null)

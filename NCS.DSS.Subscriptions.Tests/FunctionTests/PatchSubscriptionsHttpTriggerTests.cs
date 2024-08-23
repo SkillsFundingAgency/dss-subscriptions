@@ -49,12 +49,12 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             var loggerHelper = new Mock<ILogger<PatchSubscriptionsHttpTriggerRun>>();
             _patchSubscriptionsHttpTriggerService = new Mock<IPatchSubscriptionsHttpTriggerService>();
             _patchSubscriptionsHttpTriggerRun = new PatchSubscriptionsHttpTriggerRun(
-                _resourceHelper.Object, 
+                _resourceHelper.Object,
                 _httpRequestHelper.Object,
                 _validate.Object,
                 _patchSubscriptionsHttpTriggerService.Object,
                 _convertToDynamic.Object,
-                loggerHelper.Object                
+                loggerHelper.Object
                 );
 
         }
@@ -119,11 +119,11 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
-            
+
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult(_subscriptionsPatch));
-            
+
             _validationResults.Add(new ValidationResult("customer Id is Required"));
-            _validate.Setup(x => x.ValidateResource(_subscriptionsPatch)).Returns(_validationResults);        
+            _validate.Setup(x => x.ValidateResource(_subscriptionsPatch)).Returns(_validationResults);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
@@ -140,19 +140,19 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
 
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult(_subscriptionsPatch));
-            
+
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(false));
-            
+
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
 
             // Assert
             Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
-       
+
 
         [Test]
         public async Task PatchSubscriptionsHttpTrigger_ReturnsStatusCodeNoContent_WhenSubscriptionDoesNotExist()
@@ -161,12 +161,12 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult(_subscriptionsPatch));
-            
+
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
-            
+
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
-            
+
             _patchSubscriptionsHttpTriggerService.Setup(x => x.GetSubscriptionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<Models.Subscriptions>(null));
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
@@ -175,7 +175,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
 
-       
+
         [Test]
         public async Task PatchSubscriptionsHttpTrigger_ReturnsStatusCodeOk_WhenRequestIsValid()
         {
@@ -188,7 +188,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
-           
+
             _patchSubscriptionsHttpTriggerService.Setup(x => x.GetSubscriptionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult(_subscriptions));
             _patchSubscriptionsHttpTriggerService.Setup(x => x.UpdateAsync(_subscriptions, _subscriptionsPatch)).Returns(Task.FromResult(_subscriptions));
 

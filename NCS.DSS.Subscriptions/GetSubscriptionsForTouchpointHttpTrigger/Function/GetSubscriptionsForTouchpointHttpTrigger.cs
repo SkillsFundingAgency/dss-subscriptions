@@ -61,7 +61,7 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
             {
                 _loggerHelper.LogWarning($"Subscriptions not found for customer id [{customerId}]");
                 return new NoContentResult();
-            }               
+            }
             else if (subscriptions.Count == 1)
                 return new JsonResult(subscriptions[0], new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
 

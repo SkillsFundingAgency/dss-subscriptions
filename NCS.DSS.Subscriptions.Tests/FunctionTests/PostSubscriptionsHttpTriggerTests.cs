@@ -48,7 +48,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             var loggerHelper = new Mock<ILogger<PostSubscriptionsHttpTriggerRun>>();
             _postSubscriptionsHttpTriggerService = new Mock<IPostSubscriptionsHttpTriggerService>();
             _postSubscriptionsHttpTriggerRun = new PostSubscriptionsHttpTriggerRun(
-                _resourceHelper.Object, 
+                _resourceHelper.Object,
                 _httpRequestHelper.Object,
                 _validate.Object,
                 _postSubscriptionsHttpTriggerService.Object,
@@ -91,9 +91,9 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Subscriptions>(_request)).Returns(Task.FromResult<Models.Subscriptions>(null));
-            
+
             _postSubscriptionsHttpTriggerService.Setup(x => x.CreateAsync(_subscriptions)).Returns(Task.FromResult(_subscriptions));
-            
+
             // Act
             var result = await RunFunction(ValidCustomerId);
 
@@ -106,11 +106,11 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
-            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);            
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Subscriptions>(_request)).Returns(Task.FromResult(_subscriptions));
 
-            _validationResults.Add( new ValidationResult("customer Id is Required") );           
-            _validate.Setup(x => x.ValidateResource(_subscriptions)).Returns(_validationResults);        
+            _validationResults.Add(new ValidationResult("customer Id is Required"));
+            _validate.Setup(x => x.ValidateResource(_subscriptions)).Returns(_validationResults);
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -131,7 +131,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(false));
-            
+
             // Act
             var result = await RunFunction(ValidCustomerId);
 
@@ -170,7 +170,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
 
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
-            
+
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _resourceHelper.Setup(x => x.DoesSubscriptionExist(It.IsAny<Guid>(), It.IsAny<string>())).Returns(Task.FromResult<Guid?>(null));
 
@@ -182,7 +182,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
-       
+
         [Test]
         public async Task PostSubscriptionsHttpTrigger_ReturnsStatusCodeCreated_WhenRequestIsValid()
         {

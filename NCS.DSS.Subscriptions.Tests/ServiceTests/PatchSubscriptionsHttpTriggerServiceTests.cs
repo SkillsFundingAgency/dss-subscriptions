@@ -28,9 +28,9 @@ namespace NCS.DSS.Subscriptions.Tests.ServiceTests
         }
         [Test]
         public async Task PatchSubscriptionsHttpTriggerServiceTests_UpdateAsync_ReturnsNullWhenResourceCannotBeFound()
-        {            
+        {
             // Act
-            var result = await _patchSubscriptionsHttpTriggerService.UpdateAsync(null,_subscriptionsPatch);
+            var result = await _patchSubscriptionsHttpTriggerService.UpdateAsync(null, _subscriptionsPatch);
 
             // Assert
             Assert.That(result, Is.Null);
@@ -60,11 +60,11 @@ namespace NCS.DSS.Subscriptions.Tests.ServiceTests
             var responseField = typeof(ResourceResponse<Document>).GetTypeInfo().GetField("response", flags);
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
-           
+
             _documentDbProvider.Setup(x => x.UpdateSubscriptionsAsync(_subscriptions)).Returns(Task.FromResult(resourceResponse));
 
             // Act
-            var result = await _patchSubscriptionsHttpTriggerService.UpdateAsync(_subscriptions,_subscriptionsPatch);
+            var result = await _patchSubscriptionsHttpTriggerService.UpdateAsync(_subscriptions, _subscriptionsPatch);
 
             // Assert
             Assert.That(result, Is.Not.Null);

@@ -22,7 +22,7 @@ namespace NCS.DSS.Subscriptions.Tests.ModelTests
 
             // Assert
             Assert.That(_subscriptions.LastModifiedDate, Is.Not.Null);
-            
+
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace NCS.DSS.Subscriptions.Tests.ModelTests
         [Test]
         public void SubscriptionModelTests_CheckCustomerIdIsSet_WhenSetIdsIsCalled()
         {
-            
+
             // Act
             _subscriptions.SetIds(_customerId, _touchPointId);
 
@@ -62,7 +62,7 @@ namespace NCS.DSS.Subscriptions.Tests.ModelTests
         [Test]
         public void SubscriptionModelTests_CheckTouchpointIdIsSet_WhenSetIdsIsCalled()
         {
-            
+
             // Act
             _subscriptions.SetIds(_customerId, _touchPointId);
 

@@ -15,7 +15,7 @@ namespace NCS.DSS.Subscriptions.Tests.ServiceTests
         private readonly IPostSubscriptionsHttpTriggerService _postSubscriptionsHttpTriggerService;
         private readonly Mock<IDocumentDBProvider> _documentDbProvider;
 
-        private readonly Models.Subscriptions _subscriptions;  
+        private readonly Models.Subscriptions _subscriptions;
         public PostSubscriptionsHttpTriggerServiceTests()
         {
             _subscriptions = new Models.Subscriptions();
@@ -24,7 +24,7 @@ namespace NCS.DSS.Subscriptions.Tests.ServiceTests
         }
         [Test]
         public async Task PostSubscriptionsHttpTriggerServiceTests_CreateAsync_ReturnsNullWhenResourceCannotBeFound()
-        {            
+        {
             // Act
             var result = await _postSubscriptionsHttpTriggerService.CreateAsync(null);
 
@@ -56,7 +56,7 @@ namespace NCS.DSS.Subscriptions.Tests.ServiceTests
             var responseField = typeof(ResourceResponse<Document>).GetTypeInfo().GetField("response", flags);
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
-           
+
             _documentDbProvider.Setup(x => x.CreateSubscriptionsAsync(_subscriptions)).Returns(Task.FromResult(resourceResponse));
 
             // Act

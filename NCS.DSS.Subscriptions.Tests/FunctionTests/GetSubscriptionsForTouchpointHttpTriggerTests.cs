@@ -36,10 +36,10 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _guidHelper = new GuidHelper();
             _getSubscriptionsForTouchpointHttpTriggerService = new Mock<IGetSubscriptionsForTouchpointHttpTriggerService>();
             _getSubscriptionsForTouchpointHttpTrigger = new GetSubscriptionsForTouchpointHttpTriggerrRun(
-                _resourceHelper.Object, 
+                _resourceHelper.Object,
                 _httpRequestHelper.Object,
                 _getSubscriptionsForTouchpointHttpTriggerService.Object,
-                loggerHelper.Object                
+                loggerHelper.Object
                 );
 
         }
