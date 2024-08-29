@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NCS.DSS.Subscriptions.Models;
 using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Subscriptions.Models;
 
 namespace NCS.DSS.Subscriptions.Validation
 {
@@ -21,7 +19,7 @@ namespace NCS.DSS.Subscriptions.Validation
         {
             if (subscriptionrResource == null)
                 return;
-            
+
             if (subscriptionrResource.LastModifiedDate.HasValue && subscriptionrResource.LastModifiedDate.Value > DateTime.UtcNow)
                 results.Add(new ValidationResult("Last Modified Date must be less the current date/time", new[] { "LastModifiedDate" }));
 
@@ -29,7 +27,7 @@ namespace NCS.DSS.Subscriptions.Validation
 
         public SubscriptionError ValidateResultForDuplicateSubscriptionId(Guid subscriptionId)
         {
-            return new SubscriptionError{MemberName = "SubscriptionId", ErrorMessage = "Duplicate Subscription", Id = subscriptionId};
+            return new SubscriptionError { MemberName = "SubscriptionId", ErrorMessage = "Duplicate Subscription", Id = subscriptionId };
         }
 
     }

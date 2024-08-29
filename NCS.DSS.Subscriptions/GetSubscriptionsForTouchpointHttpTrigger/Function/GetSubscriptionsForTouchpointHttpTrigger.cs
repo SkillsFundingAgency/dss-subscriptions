@@ -2,17 +2,13 @@ using DFC.HTTP.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Service;
-using NCS.DSS.Subscriptions.Helpers;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Function
 {
@@ -21,21 +17,21 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
         private readonly IResourceHelper _resourceHelper;
         private readonly IHttpRequestHelper _httpRequestMessageHelper;
         private readonly IGetSubscriptionsForTouchpointHttpTriggerService _getSubscriptionsForTouchpointService;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
+        private readonly ILogger<GetSubscriptionsForTouchpointHttpTrigger> _loggerHelper;
 
         public GetSubscriptionsForTouchpointHttpTrigger(
             IResourceHelper resourceHelper,
             IHttpRequestHelper httpRequestMessageHelper,
             IGetSubscriptionsForTouchpointHttpTriggerService getSubscriptionsForTouchpointService,
-            IHttpResponseMessageHelper httpResponseMessageHelper)
+            ILogger<GetSubscriptionsForTouchpointHttpTrigger> loggerHelper)
         {
             _resourceHelper = resourceHelper;
             _httpRequestMessageHelper = httpRequestMessageHelper;
             _getSubscriptionsForTouchpointService = getSubscriptionsForTouchpointService;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
+            _loggerHelper = loggerHelper;
         }
 
-        [FunctionName("GetByTouchpoint")]
+        [Function("GetByTouchpoint")]
         [ProducesResponseType(typeof(Models.Subscriptions), (int)HttpStatusCode.OK)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Subscriptions found", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Subscriptions does not exist", ShowSchema = false)]
@@ -43,27 +39,33 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Display(Name = "Get", Description = "Ability to retrieve a single subscriptions with a given SubscriptionsId for an individual customer.")]
-        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Subscriptions/")] HttpRequest req, ILogger log, string customerId)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Subscriptions/")] HttpRequest req, string customerId)
         {
             var touchpointId = _httpRequestMessageHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                log.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
+                return new BadRequestResult();
             }
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                log.LogWarning($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions/ BadRequest");
-                return _httpResponseMessageHelper.BadRequest(customerGuid);
+                _loggerHelper.LogWarning($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions/ BadRequest");
+                return new BadRequestObjectResult(customerGuid);
             }
-            
-            var subscriptions = await _getSubscriptionsForTouchpointService.GetSubscriptionsForTouchpointAsync(customerGuid, touchpointId);
-            log.LogInformation($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions");
 
-            return subscriptions == null ?
-                _httpResponseMessageHelper.NoContent(customerGuid) :
-                _httpResponseMessageHelper.Ok(JsonHelper.SerializeObjects(subscriptions));
+            var subscriptions = await _getSubscriptionsForTouchpointService.GetSubscriptionsForTouchpointAsync(customerGuid, touchpointId);
+            _loggerHelper.LogInformation($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions");
+
+            if (subscriptions == null)
+            {
+                _loggerHelper.LogWarning($"Subscriptions not found for customer id [{customerId}]");
+                return new NoContentResult();
+            }
+            else if (subscriptions.Count == 1)
+                return new JsonResult(subscriptions[0], new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
+
+            return new JsonResult(subscriptions, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
         }
     }
 }

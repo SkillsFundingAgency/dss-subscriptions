@@ -2,7 +2,6 @@
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace NCS.DSS.Subscriptions.AppInsights
 {
@@ -23,11 +22,11 @@ namespace NCS.DSS.Subscriptions.AppInsights
             _name = string.IsNullOrEmpty(name) ? nameof(ApplicationInsightsLogger) : name;
             _filter = filter;
             _settings = settings;
-            _telemetryClient = new TelemetryClient();
+            _telemetryClient = new TelemetryClient(TelemetryConfiguration.CreateDefault());
 
             if (_settings.LocalEnvironmentMode.HasValue)
             {
-                TelemetryConfiguration.Active.TelemetryChannel.DeveloperMode = _settings.LocalEnvironmentMode;
+                TelemetryConfiguration.CreateDefault().TelemetryChannel.DeveloperMode = _settings.LocalEnvironmentMode;
             }
 
             if (!_settings.LocalEnvironmentMode.Value)
@@ -37,7 +36,7 @@ namespace NCS.DSS.Subscriptions.AppInsights
                     throw new ArgumentNullException(nameof(_settings.InstrumentationKey));
                 }
 
-                TelemetryConfiguration.Active.InstrumentationKey = _settings.InstrumentationKey;
+                TelemetryConfiguration.CreateDefault().ConnectionString = _settings.InstrumentationKey;
                 _telemetryClient.InstrumentationKey = _settings.InstrumentationKey;
             }
         }
