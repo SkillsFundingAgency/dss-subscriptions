@@ -26,6 +26,12 @@
     "sharedAppServicePlanResourceGroup": {
       "type": "string"
     },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "storageAccountKey": {
+      "type": "string"
+    },
     "templateBaseUrl": {
       "type": "string"
     },
@@ -72,6 +78,12 @@
                 },
                 "cosmosDbKey": {
                   "value": "[parameters('cosmosDbKey')]"
+                },
+                "storageAccountKey": {
+                  "value": "[parameters('storageAccountKey')]"
+                },
+                "storageAccountName": {
+                  "value": "[parameters('storageAccountName')]"
                 },
                 "workspaceId": {
                   "value": "[resourceId(parameters('workspaceResourceGroup'), 'Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"

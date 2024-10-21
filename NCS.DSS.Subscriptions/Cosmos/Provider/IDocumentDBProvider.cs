@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
+﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 
 namespace NCS.DSS.Subscriptions.Cosmos.Provider
@@ -14,5 +11,6 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
         Task<Models.Subscriptions> GetSubscriptionsForCustomerAsync(Guid? customerId, Guid? subscriptionId);
         Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions);
         Task<ResourceResponse<Document>> UpdateSubscriptionsAsync(Models.Subscriptions subscriptions);
+        Task<List<Models.Subscriptions>> GetSubscriptionsForTouchpointAsync(Guid? customerId, string touchpointId);
     }
 }
