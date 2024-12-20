@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.Helpers;
 using NCS.DSS.Subscriptions.Models;
 using NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service;
@@ -27,7 +26,6 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
         // local variables
         private HttpRequest _request;
         private Mock<IValidate> _validate;
-        private Mock<IResourceHelper> _resourceHelper;
         private Mock<IConvertToDynamic> _convertToDynamic;
         private Mock<IPatchSubscriptionsHttpTriggerService> _patchSubscriptionsHttpTriggerService;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
@@ -43,18 +41,16 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _request = (new DefaultHttpContext()).Request;
             _validate = new Mock<IValidate>();
             _validationResults = new List<ValidationResult> { };
-            _resourceHelper = new Mock<IResourceHelper>();
             _convertToDynamic = new Mock<IConvertToDynamic>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
-            var loggerHelper = new Mock<ILogger<PatchSubscriptionsHttpTriggerRun>>();
+            var logger = new Mock<ILogger<PatchSubscriptionsHttpTriggerRun>>();
             _patchSubscriptionsHttpTriggerService = new Mock<IPatchSubscriptionsHttpTriggerService>();
             _patchSubscriptionsHttpTriggerRun = new PatchSubscriptionsHttpTriggerRun(
-                _resourceHelper.Object,
                 _httpRequestHelper.Object,
                 _validate.Object,
                 _patchSubscriptionsHttpTriggerService.Object,
                 _convertToDynamic.Object,
-                loggerHelper.Object
+                logger.Object
                 );
 
         }
@@ -104,7 +100,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
-            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult<SubscriptionsPatch>(null));
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult<SubscriptionsPatch>(_subscriptionsPatch));
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
@@ -144,7 +140,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(false));
+            _patchSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(false));
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
@@ -165,9 +161,9 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _patchSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
 
-            _patchSubscriptionsHttpTriggerService.Setup(x => x.GetSubscriptionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<Models.Subscriptions>(null));
+            _patchSubscriptionsHttpTriggerService.Setup(x => x.GetSubscriptionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<Models.Subscriptions>(_subscriptions));
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
 
@@ -187,7 +183,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _patchSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
 
             _patchSubscriptionsHttpTriggerService.Setup(x => x.GetSubscriptionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult(_subscriptions));
             _patchSubscriptionsHttpTriggerService.Setup(x => x.UpdateAsync(_subscriptions, _subscriptionsPatch)).Returns(Task.FromResult(_subscriptions));

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.Helpers;
 using NCS.DSS.Subscriptions.Models;
 using NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service;
@@ -17,26 +16,23 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
 {
     public class PatchSubscriptionsHttpTrigger
     {
-        private readonly IResourceHelper _resourceHelper;
         private readonly IHttpRequestHelper _httpRequestMessageHelper;
         private readonly IValidate _validate;
         private readonly IPatchSubscriptionsHttpTriggerService _subscriptionsPatchService;
-        private readonly ILogger<PatchSubscriptionsHttpTrigger> _loggerHelper;
+        private readonly ILogger<PatchSubscriptionsHttpTrigger> _logger;
         private readonly IConvertToDynamic _convertToDynamic;
         public PatchSubscriptionsHttpTrigger(
-           IResourceHelper resourceHelper,
            IHttpRequestHelper httpRequestMessageHelper,
            IValidate validate,
            IPatchSubscriptionsHttpTriggerService subscriptionsPatchService,
            IConvertToDynamic convertToDynamic,
-           ILogger<PatchSubscriptionsHttpTrigger> loggerHelper)
+           ILogger<PatchSubscriptionsHttpTrigger> logger)
         {
-            _resourceHelper = resourceHelper;
             _httpRequestMessageHelper = httpRequestMessageHelper;
             _validate = validate;
             _subscriptionsPatchService = subscriptionsPatchService;
             _convertToDynamic = convertToDynamic;
-            _loggerHelper = loggerHelper;
+            _logger = logger;
         }
 
         [Function("Patch")]
@@ -53,21 +49,21 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
             var touchpointId = _httpRequestMessageHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _loggerHelper.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} Unable to locate 'TouchpointId' in request header");
+                _logger.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} Unable to locate 'TouchpointId' in request header");
                 return new BadRequestResult();
             }
 
-            _loggerHelper.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
+            _logger.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                _loggerHelper.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} BadRequest CustomerId");
+                _logger.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} BadRequest CustomerId");
                 return new BadRequestObjectResult(customerGuid);
             }
 
             if (!Guid.TryParse(subscriptionId, out var subscriptionsGuid))
             {
-                _loggerHelper.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} BadRequest subscriptionId");
+                _logger.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} BadRequest subscriptionId");
                 return new BadRequestObjectResult(subscriptionsGuid);
             }
 
@@ -79,13 +75,13 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
             }
             catch (Exception ex)
             {
-                _loggerHelper.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} exception {ex.Message}");
+                _logger.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} exception {ex.Message}");
                 return new UnprocessableEntityObjectResult(_convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException"]));
             }
 
             if (subscriptionsPatchRequest == null)
             {
-                _loggerHelper.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} subscriptionsPatchRequest is null");
+                _logger.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} subscriptionsPatchRequest is null");
                 return new UnprocessableEntityObjectResult(req);
             }
 
@@ -95,15 +91,15 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                _loggerHelper.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} errors at ValidateResource ");
+                _logger.LogError($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} errors at ValidateResource ");
                 return new UnprocessableEntityObjectResult(errors);
             }
 
-            var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
+            var doesCustomerExist = await _subscriptionsPatchService.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                _loggerHelper.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} customer doesCustomerExist ");
+                _logger.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} customer doesCustomerExist ");
                 return new NoContentResult();
             }
 
@@ -111,12 +107,12 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
 
             if (subscriptions == null)
             {
-                _loggerHelper.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} subscriptions  is null ");
+                _logger.LogWarning($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} subscriptions  is null ");
                 return new NoContentResult();
             }
 
             var updatedSubscriptions = await _subscriptionsPatchService.UpdateAsync(subscriptions, subscriptionsPatchRequest);
-            _loggerHelper.LogInformation($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} updatedSubscriptions");
+            _logger.LogInformation($"PatchSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions/{subscriptionId} updatedSubscriptions");
 
 
             return updatedSubscriptions == null ?

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Service;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
@@ -14,21 +13,18 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
 {
     public class GetSubscriptionsForTouchpointHttpTrigger
     {
-        private readonly IResourceHelper _resourceHelper;
         private readonly IHttpRequestHelper _httpRequestMessageHelper;
         private readonly IGetSubscriptionsForTouchpointHttpTriggerService _getSubscriptionsForTouchpointService;
-        private readonly ILogger<GetSubscriptionsForTouchpointHttpTrigger> _loggerHelper;
+        private readonly ILogger<GetSubscriptionsForTouchpointHttpTrigger> _logger;
 
         public GetSubscriptionsForTouchpointHttpTrigger(
-            IResourceHelper resourceHelper,
             IHttpRequestHelper httpRequestMessageHelper,
             IGetSubscriptionsForTouchpointHttpTriggerService getSubscriptionsForTouchpointService,
-            ILogger<GetSubscriptionsForTouchpointHttpTrigger> loggerHelper)
+            ILogger<GetSubscriptionsForTouchpointHttpTrigger> logger)
         {
-            _resourceHelper = resourceHelper;
             _httpRequestMessageHelper = httpRequestMessageHelper;
             _getSubscriptionsForTouchpointService = getSubscriptionsForTouchpointService;
-            _loggerHelper = loggerHelper;
+            _logger = logger;
         }
 
         [Function("GetByTouchpoint")]
@@ -44,22 +40,28 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
             var touchpointId = _httpRequestMessageHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _loggerHelper.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
+                _logger.LogInformation("Unable to locate 'APIM-TouchpointId' in request header");
                 return new BadRequestResult();
             }
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                _loggerHelper.LogWarning($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions/ BadRequest");
+                _logger.LogWarning($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions/ BadRequest");
                 return new BadRequestObjectResult(customerGuid);
             }
+            var doesCustomerExist = await _getSubscriptionsForTouchpointService.DoesCustomerExist(customerGuid);
 
+            if (!doesCustomerExist)
+            {
+                _logger.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions does notvCustomerExist ");
+                return new NoContentResult();
+            }
             var subscriptions = await _getSubscriptionsForTouchpointService.GetSubscriptionsForTouchpointAsync(customerGuid, touchpointId);
-            _loggerHelper.LogInformation($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions");
+            _logger.LogInformation($"GetSubscriptionsForTouchpointHttpTrigger Customers/{customerId}/Subscriptions");
 
             if (subscriptions == null)
             {
-                _loggerHelper.LogWarning($"Subscriptions not found for customer id [{customerId}]");
+                _logger.LogWarning($"Subscriptions not found for customer id [{customerId}]");
                 return new NoContentResult();
             }
             else if (subscriptions.Count == 1)

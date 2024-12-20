@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.Helpers;
 using NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service;
 using NCS.DSS.Subscriptions.Validation;
@@ -16,26 +15,23 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
 {
     public class PostSubscriptionsHttpTrigger
     {
-        private readonly IResourceHelper _resourceHelper;
         private readonly IHttpRequestHelper _httpRequestHelper;
         private readonly IValidate _validate;
         private readonly IPostSubscriptionsHttpTriggerService _subscriptionsPostService;
-        private readonly ILogger<PostSubscriptionsHttpTrigger> _loggerHelper;
+        private readonly ILogger<PostSubscriptionsHttpTrigger> _logger;
         private readonly IConvertToDynamic _convertToDynamic;
 
         public PostSubscriptionsHttpTrigger(
-            IResourceHelper resourceHelper,
             IHttpRequestHelper httpRequestMessageHelper,
             IValidate validate,
             IPostSubscriptionsHttpTriggerService subscriptionsPostService,
-            ILogger<PostSubscriptionsHttpTrigger> loggerHelper,
+            ILogger<PostSubscriptionsHttpTrigger> logger,
             IConvertToDynamic convertToDynamic)
         {
-            _resourceHelper = resourceHelper;
             _httpRequestHelper = httpRequestMessageHelper;
             _validate = validate;
             _subscriptionsPostService = subscriptionsPostService;
-            _loggerHelper = loggerHelper;
+            _logger = logger;
             _convertToDynamic = convertToDynamic;
         }
 
@@ -53,15 +49,15 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _loggerHelper.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions Unable to locate 'TouchpointId' in request header");
+                _logger.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions Unable to locate 'TouchpointId' in request header");
                 return new BadRequestResult();
             }
 
-            _loggerHelper.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
+            _logger.LogInformation("C# HTTP trigger function processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                _loggerHelper.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions customerGuid BadRequest");
+                _logger.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions customerGuid BadRequest");
                 return new BadRequestObjectResult(customerGuid);
             }
 
@@ -73,13 +69,13 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             }
             catch (Exception ex)
             {
-                _loggerHelper.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions JsonSerializationException");
+                _logger.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions JsonSerializationException");
                 return new UnprocessableEntityObjectResult(_convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException"]));
             }
 
             if (subscriptionsRequest == null)
             {
-                _loggerHelper.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions subscriptionsRequest is null");
+                _logger.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions subscriptionsRequest is null");
                 return new UnprocessableEntityObjectResult(req);
             }
 
@@ -89,30 +85,30 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
 
             if (errors != null && errors.Count > 0)
             {
-                _loggerHelper.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions errors in ValidateResource");
+                _logger.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions errors in ValidateResource");
                 return new UnprocessableEntityObjectResult(errors);
             }
 
-            var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
+            var doesCustomerExist = await _subscriptionsPostService.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                _loggerHelper.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions does notvCustomerExist ");
+                _logger.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions does notvCustomerExist ");
                 return new NoContentResult();
             }
 
-            var doesSubscriptionExist = await _resourceHelper.DoesSubscriptionExist(customerGuid, touchpointId);
+            var doesSubscriptionExist = await _subscriptionsPostService.DoesSubscriptionExist(customerGuid, touchpointId);
 
             if (doesSubscriptionExist.HasValue)
             {
                 var duplicateError = _validate.ValidateResultForDuplicateSubscriptionId(doesSubscriptionExist.GetValueOrDefault());
-                _loggerHelper.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions Subscription conflict. {duplicateError} ");
+                _logger.LogError($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions Subscription conflict. {duplicateError} ");
                 return new ConflictResult();
             }
 
             var subscriptions = await _subscriptionsPostService.CreateAsync(subscriptionsRequest);
 
-            _loggerHelper.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions CreateAsync called");
+            _logger.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions CreateAsync called");
 
             return subscriptions == null
                 ? new BadRequestObjectResult(customerGuid)

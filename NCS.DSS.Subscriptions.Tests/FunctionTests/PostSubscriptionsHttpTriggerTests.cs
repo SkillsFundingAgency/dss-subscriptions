@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.Helpers;
 using NCS.DSS.Subscriptions.Models;
 using NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service;
@@ -29,7 +28,6 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
         private HttpRequest _request;
         private Mock<IValidate> _validate;
         private List<ValidationResult> _validationResults;
-        private Mock<IResourceHelper> _resourceHelper;
         private Mock<IConvertToDynamic> _convertToDynamic;
         private Mock<IPostSubscriptionsHttpTriggerService> _postSubscriptionsHttpTriggerService;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
@@ -42,17 +40,15 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _request = (new DefaultHttpContext()).Request;
             _validate = new Mock<IValidate>();
             _validationResults = new List<ValidationResult> { };
-            _resourceHelper = new Mock<IResourceHelper>();
             _convertToDynamic = new Mock<IConvertToDynamic>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
-            var loggerHelper = new Mock<ILogger<PostSubscriptionsHttpTriggerRun>>();
+            var logger = new Mock<ILogger<PostSubscriptionsHttpTriggerRun>>();
             _postSubscriptionsHttpTriggerService = new Mock<IPostSubscriptionsHttpTriggerService>();
             _postSubscriptionsHttpTriggerRun = new PostSubscriptionsHttpTriggerRun(
-                _resourceHelper.Object,
                 _httpRequestHelper.Object,
                 _validate.Object,
                 _postSubscriptionsHttpTriggerService.Object,
-                loggerHelper.Object,
+                logger.Object,
                 _convertToDynamic.Object
                 );
 
@@ -90,7 +86,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
-            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Subscriptions>(_request)).Returns(Task.FromResult<Models.Subscriptions>(null));
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Subscriptions>(_request)).Returns(Task.FromResult<Models.Subscriptions>(_subscriptions));
 
             _postSubscriptionsHttpTriggerService.Setup(x => x.CreateAsync(_subscriptions)).Returns(Task.FromResult(_subscriptions));
 
@@ -130,7 +126,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(false));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(false));
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -149,8 +145,8 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
-            _resourceHelper.Setup(x => x.DoesSubscriptionExist(It.IsAny<Guid>(), It.IsAny<string>())).Returns((Task.FromResult(_subscriptionId)));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.DoesSubscriptionExist(It.IsAny<Guid>(), It.IsAny<string>())).Returns((Task.FromResult(_subscriptionId)));
             _validate.Setup(x => x.ValidateResultForDuplicateSubscriptionId(It.IsAny<Guid>())).Returns(await Task.FromResult(new SubscriptionError() { }));
 
             // Act
@@ -171,10 +167,10 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
-            _resourceHelper.Setup(x => x.DoesSubscriptionExist(It.IsAny<Guid>(), It.IsAny<string>())).Returns(Task.FromResult<Guid?>(null));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.DoesSubscriptionExist(It.IsAny<Guid>(), It.IsAny<string>())).Returns(Task.FromResult<Guid?>(null));
 
-            _postSubscriptionsHttpTriggerService.Setup(x => x.CreateAsync(_subscriptions)).Returns(Task.FromResult<Models.Subscriptions>(null));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.CreateAsync(_subscriptions)).Returns(Task.FromResult<Models.Subscriptions>(_subscriptions));
             // Act
             var result = await RunFunction(ValidCustomerId);
 
@@ -194,8 +190,8 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validationResults.Clear();
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
-            _resourceHelper.Setup(x => x.DoesSubscriptionExist(It.IsAny<Guid>(), It.IsAny<string>())).Returns(Task.FromResult<Guid?>(null));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.DoesSubscriptionExist(It.IsAny<Guid>(), It.IsAny<string>())).Returns(Task.FromResult<Guid?>(null));
 
             _postSubscriptionsHttpTriggerService.Setup(x => x.CreateAsync(_subscriptions)).Returns(Task.FromResult(_subscriptions));
 

@@ -1,10 +1,8 @@
-﻿using DFC.Common.Standard.GuidHelper;
-using DFC.HTTP.Standard;
+﻿using DFC.HTTP.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NCS.DSS.Subscriptions.Cosmos.Helper;
 using NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Service;
 using System.Net;
 using GetSubscriptionsForTouchpointHttpTriggerrRun = NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Function.GetSubscriptionsForTouchpointHttpTrigger;
@@ -19,27 +17,22 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
         private readonly Guid _customerId = Guid.Parse("1dd4d206-131a-44fd-8e2d-18b88b383f72");
         private const string _touchPointId = "0000000001";
         private HttpRequest _request;
-        private Mock<IResourceHelper> _resourceHelper;
         private Mock<IGetSubscriptionsForTouchpointHttpTriggerService> _getSubscriptionsForTouchpointHttpTriggerService;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
         private List<Models.Subscriptions> _subscriptions;
-        private IGuidHelper _guidHelper;
         private GetSubscriptionsForTouchpointHttpTriggerrRun _getSubscriptionsForTouchpointHttpTrigger;
         [SetUp]
         public void Setup()
         {
-            _subscriptions = new List<Models.Subscriptions>();
+            _subscriptions = [];
             _request = (new DefaultHttpContext()).Request;
-            _resourceHelper = new Mock<IResourceHelper>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
-            var loggerHelper = new Mock<ILogger<GetSubscriptionsForTouchpointHttpTriggerrRun>>();
-            _guidHelper = new GuidHelper();
+            var logger = new Mock<ILogger<GetSubscriptionsForTouchpointHttpTriggerrRun>>();
             _getSubscriptionsForTouchpointHttpTriggerService = new Mock<IGetSubscriptionsForTouchpointHttpTriggerService>();
             _getSubscriptionsForTouchpointHttpTrigger = new GetSubscriptionsForTouchpointHttpTriggerrRun(
-                _resourceHelper.Object,
                 _httpRequestHelper.Object,
                 _getSubscriptionsForTouchpointHttpTriggerService.Object,
-                loggerHelper.Object
+                logger.Object
                 );
 
         }
@@ -74,8 +67,8 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
-            _getSubscriptionsForTouchpointHttpTriggerService.Setup(x => x.GetSubscriptionsForTouchpointAsync(_customerId, _touchPointId)).Returns(Task.FromResult<List<Models.Subscriptions>>(null));
+            _getSubscriptionsForTouchpointHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _getSubscriptionsForTouchpointHttpTriggerService.Setup(x => x.GetSubscriptionsForTouchpointAsync(_customerId, _touchPointId)).Returns(Task.FromResult<List<Models.Subscriptions>>(_subscriptions));
 
             // Act
             var result = await RunFunction(ValidCustomerId);
@@ -88,7 +81,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
-            _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+            _getSubscriptionsForTouchpointHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _getSubscriptionsForTouchpointHttpTriggerService.Setup(x => x.GetSubscriptionsForTouchpointAsync(It.IsAny<Guid>(), It.IsAny<string>())).Returns(Task.FromResult(_subscriptions));
 
             // Act
