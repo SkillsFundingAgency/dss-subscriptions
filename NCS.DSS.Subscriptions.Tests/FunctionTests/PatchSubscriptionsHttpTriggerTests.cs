@@ -29,7 +29,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
         private Mock<IConvertToDynamic> _convertToDynamic;
         private Mock<IPatchSubscriptionsHttpTriggerService> _patchSubscriptionsHttpTriggerService;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
-        private Models.Subscriptions _subscriptions;
+        private Models.Subscriptions? _subscriptions;
         private SubscriptionsPatch _subscriptionsPatch;
         private PatchSubscriptionsHttpTriggerRun _patchSubscriptionsHttpTriggerRun;
         private List<ValidationResult> _validationResults;
@@ -100,7 +100,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
-            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult<SubscriptionsPatch>(_subscriptionsPatch));
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult<SubscriptionsPatch>(null));
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
@@ -162,8 +162,8 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _validate.Setup(x => x.ValidateResource(It.IsAny<ISubscription>())).Returns(_validationResults);
 
             _patchSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
-
-            _patchSubscriptionsHttpTriggerService.Setup(x => x.GetSubscriptionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<Models.Subscriptions>(_subscriptions));
+            _subscriptions = null;
+            _patchSubscriptionsHttpTriggerService.Setup(x => x.GetSubscriptionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult(_subscriptions));
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
 

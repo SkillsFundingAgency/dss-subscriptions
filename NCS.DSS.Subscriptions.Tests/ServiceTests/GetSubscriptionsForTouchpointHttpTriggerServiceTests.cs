@@ -20,14 +20,9 @@ namespace NCS.DSS.Subscriptions.Tests.ServiceTests
         public async Task GetSubscriptionsForTouchpointHttpTriggerServiceTests_GetSubscriptionsForTouchpointAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            var subscriptions = new List<Models.Subscriptions>()
-            {
-                new()
-            };
 
-            _cosmosDbProvider.Setup(x => x.GetSubscriptionsForTouchpointAsync(_customerId, _touchPointId)).Returns(Task.FromResult(subscriptions));
-
-            // Act
+            _cosmosDbProvider.Setup(x => x.GetSubscriptionsForTouchpointAsync(_customerId, _touchPointId)).Returns(Task.FromResult<List<Models.Subscriptions>>(null));
+                        // Act
             var result = await _getSubscriptionsForTouchpointHttpTriggerService.GetSubscriptionsForTouchpointAsync(_customerId, _touchPointId);
 
             // Assert

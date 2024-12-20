@@ -86,7 +86,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
-            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Subscriptions>(_request)).Returns(Task.FromResult<Models.Subscriptions>(_subscriptions));
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<Models.Subscriptions>(_request)).Returns(Task.FromResult<Models.Subscriptions>(null));
 
             _postSubscriptionsHttpTriggerService.Setup(x => x.CreateAsync(_subscriptions)).Returns(Task.FromResult(_subscriptions));
 
@@ -170,7 +170,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             _postSubscriptionsHttpTriggerService.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _postSubscriptionsHttpTriggerService.Setup(x => x.DoesSubscriptionExist(It.IsAny<Guid>(), It.IsAny<string>())).Returns(Task.FromResult<Guid?>(null));
 
-            _postSubscriptionsHttpTriggerService.Setup(x => x.CreateAsync(_subscriptions)).Returns(Task.FromResult<Models.Subscriptions>(_subscriptions));
+            _postSubscriptionsHttpTriggerService.Setup(x => x.CreateAsync(_subscriptions)).Returns(Task.FromResult<Models.Subscriptions>(null));
             // Act
             var result = await RunFunction(ValidCustomerId);
 
