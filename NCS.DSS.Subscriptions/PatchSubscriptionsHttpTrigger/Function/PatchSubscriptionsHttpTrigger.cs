@@ -109,8 +109,8 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                var response = new UnprocessableEntityObjectResult(errors);
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. validation errors with resource {Errors}", correlationId, response.StatusCode,string.Join(',', errors));
+                var response = new UnprocessableEntityObjectResult(string.Join(',', errors));
+                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. validation errors with resource {Errors}", correlationId, response.StatusCode,errors);
                 return response;
             }
             _logger.LogInformation("{CorrelationId} Attempting to see if customer exists {customerGuid}", correlationId, customerGuid);
