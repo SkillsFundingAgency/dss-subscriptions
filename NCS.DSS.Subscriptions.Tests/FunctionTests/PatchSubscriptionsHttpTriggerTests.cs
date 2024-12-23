@@ -65,7 +65,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);
 
             // Assert
-            Assert.That(result, Is.InstanceOf<BadRequestResult>());
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]

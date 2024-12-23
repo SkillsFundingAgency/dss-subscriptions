@@ -24,7 +24,9 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
         [SetUp]
         public void Setup()
         {
-            _subscriptions = [];
+            _subscriptions = [
+                new Models.Subscriptions()
+                ];
             _request = (new DefaultHttpContext()).Request;
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
             var logger = new Mock<ILogger<GetSubscriptionsForTouchpointHttpTriggerrRun>>();
@@ -47,7 +49,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId);
 
             // Assert
-            Assert.That(result, Is.InstanceOf<BadRequestResult>());
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
