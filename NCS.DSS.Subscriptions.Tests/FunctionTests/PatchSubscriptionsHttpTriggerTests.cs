@@ -100,7 +100,7 @@ namespace NCS.DSS.Subscriptions.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns(_touchPointId);
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
-            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult<SubscriptionsPatch>(null));
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<SubscriptionsPatch>(_request)).Returns(Task.FromResult<SubscriptionsPatch>(null!));
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidSubscriptionId);

@@ -21,7 +21,7 @@ namespace NCS.DSS.Subscriptions.Tests.ServiceTests
         {
             // Arrange
 
-            _cosmosDbProvider.Setup(x => x.GetSubscriptionsForTouchpointAsync(_customerId, _touchPointId)).Returns(Task.FromResult<List<Models.Subscriptions>>(null));
+            _cosmosDbProvider.Setup(x => x.GetSubscriptionsForTouchpointAsync(_customerId, _touchPointId)).Returns(Task.FromResult<List<Models.Subscriptions>>(null!));
                         // Act
             var result = await _getSubscriptionsForTouchpointHttpTriggerService.GetSubscriptionsForTouchpointAsync(_customerId, _touchPointId);
 
