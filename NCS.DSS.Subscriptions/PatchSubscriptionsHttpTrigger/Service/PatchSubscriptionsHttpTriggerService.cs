@@ -5,10 +5,10 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service
 {
     public class PatchSubscriptionsHttpTriggerService : IPatchSubscriptionsHttpTriggerService
     {
-        private readonly IDocumentDBProvider _documentDbProvider;
-        public PatchSubscriptionsHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        private readonly ICosmosDBProvider _cosmosDbProvider;
+        public PatchSubscriptionsHttpTriggerService(ICosmosDBProvider cosmosDbProvider)
         {
-            _documentDbProvider = documentDbProvider;
+            _cosmosDbProvider = cosmosDbProvider;
         }
         public async Task<Models.Subscriptions> UpdateAsync(Models.Subscriptions subscriptions, Models.SubscriptionsPatch subscriptionsPatch)
         {
@@ -20,7 +20,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service
 
             subscriptions.Patch(subscriptionsPatch);
 
-            var response = await _documentDbProvider.UpdateSubscriptionsAsync(subscriptions);
+            var response = await _cosmosDbProvider.UpdateSubscriptionsAsync(subscriptions);
 
             var responseStatusCode = response.StatusCode;
 
@@ -29,9 +29,13 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Service
 
         public async Task<Models.Subscriptions> GetSubscriptionsForCustomerAsync(Guid customerId, Guid subscriptionId)
         {
-            var subscriptions = await _documentDbProvider.GetSubscriptionsForCustomerAsync(customerId, subscriptionId);
+            var subscriptions = await _cosmosDbProvider.GetSubscriptionsForCustomerAsync(customerId, subscriptionId);
 
             return subscriptions;
+        }
+        public async Task<bool> DoesCustomerExist(Guid customerId)
+        {
+            return await _cosmosDbProvider.DoesCustomerResourceExist(customerId); 
         }
     }
 }

@@ -4,5 +4,6 @@
     {
         Task<Models.Subscriptions> UpdateAsync(Models.Subscriptions subscriptions, Models.SubscriptionsPatch subscriptionsPatch);
         Task<Models.Subscriptions> GetSubscriptionsForCustomerAsync(Guid customerId, Guid subscriptionId);
+        Task<bool> DoesCustomerExist(Guid customerId);
     }
 }
