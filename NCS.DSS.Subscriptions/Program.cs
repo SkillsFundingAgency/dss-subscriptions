@@ -1,3 +1,4 @@
+using Azure.Identity;
 using DFC.HTTP.Standard;
 using DFC.Swagger.Standard;
 using Microsoft.Azure.Cosmos;
@@ -42,12 +43,14 @@ internal class Program
                 services.AddSingleton<ICosmosDBProvider, CosmosDBProvider>();
                 services.AddSingleton(sp =>
                 {
-                    var settings = sp.GetRequiredService<IOptions<SubscriptionsConfigurationSettings>>().Value;
-                    var options = new CosmosClientOptions()
+                    var cosmosDbEndpoint = configuration["CosmosDbEndpoint"];
+                    if (string.IsNullOrEmpty(cosmosDbEndpoint))
                     {
-                        ConnectionMode = ConnectionMode.Gateway
-                    };
-                    return new CosmosClient(settings.SubscriptionsConnectionString, options);
+                        throw new InvalidOperationException("CosmosDbEndpoint is not configured.");
+                    }
+
+                    var options = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Gateway };
+                    return new CosmosClient(cosmosDbEndpoint, new DefaultAzureCredential(), options);
                 });
                 services.AddTransient<IValidate, Validate>();
                 services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();

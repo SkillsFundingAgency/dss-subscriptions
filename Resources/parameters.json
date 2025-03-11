@@ -25,6 +25,9 @@
         }, 
         "appInsightsInstrumentationKey": {
             "value": "__appInsightsInstrumentationKey__" 
+        },
+        "CosmosDbEndpoint": {
+            "value": "__CosmosDbEndpoint__" 
         }
     }
 }
