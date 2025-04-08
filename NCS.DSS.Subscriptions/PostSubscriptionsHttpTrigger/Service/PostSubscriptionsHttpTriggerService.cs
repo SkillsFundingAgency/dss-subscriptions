@@ -5,10 +5,10 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
 {
     public class PostSubscriptionsHttpTriggerService : IPostSubscriptionsHttpTriggerService
     {
-        private readonly IDocumentDBProvider _documentDbProvider;
-        public PostSubscriptionsHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        private readonly ICosmosDBProvider _cosmosDbProvider;
+        public PostSubscriptionsHttpTriggerService(ICosmosDBProvider cosmosDbProvider)
         {
-            _documentDbProvider = documentDbProvider;
+            _cosmosDbProvider = cosmosDbProvider;
         }
         public async Task<Models.Subscriptions> CreateAsync(Models.Subscriptions subscriptions)
         {
@@ -21,9 +21,17 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Service
             if (!subscriptions.LastModifiedDate.HasValue)
                 subscriptions.LastModifiedDate = DateTime.Now;
 
-            var response = await _documentDbProvider.CreateSubscriptionsAsync(subscriptions);
+            var response = await _cosmosDbProvider.CreateSubscriptionsAsync(subscriptions);
 
             return response.StatusCode == HttpStatusCode.Created ? (dynamic)response.Resource : (Guid?)null;
+        }
+        public async Task<bool> DoesCustomerExist(Guid customerId)
+        {
+            return await _cosmosDbProvider.DoesCustomerResourceExist(customerId);
+        }
+        public async Task<Guid?> DoesSubscriptionExist(Guid customerId,string touchpointId)
+        {
+            return await _cosmosDbProvider.DoesSubscriptionExist(customerId,touchpointId);
         }
     }
 }

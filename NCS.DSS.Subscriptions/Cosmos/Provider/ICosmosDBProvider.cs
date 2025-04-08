@@ -1,16 +1,15 @@
-﻿using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Cosmos;
 
 namespace NCS.DSS.Subscriptions.Cosmos.Provider
 {
-    public interface IDocumentDBProvider
+    public interface ICosmosDBProvider
     {
         Task<bool> DoesCustomerResourceExist(Guid customerId);
         Task<Guid?> DoesSubscriptionExist(Guid customerId, string touchpointId);
         Task<List<Models.Subscriptions>> SearchAllSubscriptions();
         Task<Models.Subscriptions> GetSubscriptionsForCustomerAsync(Guid? customerId, Guid? subscriptionId);
-        Task<ResourceResponse<Document>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions);
-        Task<ResourceResponse<Document>> UpdateSubscriptionsAsync(Models.Subscriptions subscriptions);
+        Task<ItemResponse<Models.Subscriptions>> CreateSubscriptionsAsync(Models.Subscriptions subscriptions);
+        Task<ItemResponse<Models.Subscriptions>> UpdateSubscriptionsAsync(Models.Subscriptions subscriptions);
         Task<List<Models.Subscriptions>> GetSubscriptionsForTouchpointAsync(Guid? customerId, string touchpointId);
     }
 }

@@ -3,5 +3,6 @@
     public interface IGetSubscriptionsForTouchpointHttpTriggerService
     {
         Task<List<Models.Subscriptions>> GetSubscriptionsForTouchpointAsync(Guid customerId, string TouchpointId);
+        Task<bool> DoesCustomerExist(Guid customerId);
     }
 }

@@ -7,7 +7,7 @@ namespace NCS.DSS.Subscriptions.Tests.ModelTests
         private Models.Subscriptions _subscriptions;
         private readonly Guid _customerId = Guid.Parse("1dd4d206-131a-44fd-8e2d-18b88b383f72");
         private readonly Guid? _subscriptionId = Guid.Parse("0f0ce9cd-5f0e-41f7-84e7-6532e01691ae");
-        private const string _touchPointId = "0000000001";
+        private string _touchPointId = "0000000001";
         [SetUp]
         public void Setup()
         {
