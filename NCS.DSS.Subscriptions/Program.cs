@@ -43,14 +43,30 @@ internal class Program
                 services.AddSingleton<ICosmosDBProvider, CosmosDBProvider>();
                 services.AddSingleton(sp =>
                 {
-                    var cosmosDbEndpoint = configuration["CosmosDbEndpoint"];
-                    if (string.IsNullOrEmpty(cosmosDbEndpoint))
-                    {
-                        throw new InvalidOperationException("CosmosDbEndpoint is not configured.");
-                    }
+                    var logger = sp.GetRequiredService<ILogger<Program>>();
 
-                    var options = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Gateway };
-                    return new CosmosClient(cosmosDbEndpoint, new DefaultAzureCredential(), options);
+                    var connectionString = configuration["SubscriptionsConnectionString"];
+                    var endpoint = configuration["CosmosDbEndpoint"];
+
+                    var options = new CosmosClientOptions
+                    {
+                        ConnectionMode = ConnectionMode.Gateway
+                    };
+
+                    if (!string.IsNullOrWhiteSpace(endpoint))
+                    {
+                        logger.LogInformation("Using DefaultAzureCredential for Cosmos DB (managed identity)");
+                        return new CosmosClient(endpoint, new DefaultAzureCredential(), options);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(connectionString))
+                    {
+                        logger.LogInformation("No managed identity found: using Cosmos DB connection string (local development)");
+                        return new CosmosClient(connectionString, options);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Neither CosmosDbEndpoint or a ConnectionString are configured");
+                    }
                 });
                 services.AddTransient<IValidate, Validate>();
                 services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
