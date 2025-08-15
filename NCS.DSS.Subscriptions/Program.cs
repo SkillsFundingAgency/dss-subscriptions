@@ -1,3 +1,4 @@
+using Azure.Identity;
 using DFC.HTTP.Standard;
 using DFC.Swagger.Standard;
 using Microsoft.Azure.Cosmos;
@@ -42,12 +43,30 @@ internal class Program
                 services.AddSingleton<ICosmosDBProvider, CosmosDBProvider>();
                 services.AddSingleton(sp =>
                 {
-                    var settings = sp.GetRequiredService<IOptions<SubscriptionsConfigurationSettings>>().Value;
-                    var options = new CosmosClientOptions()
+                    var logger = sp.GetRequiredService<ILogger<Program>>();
+
+                    var connectionString = configuration["SubscriptionsConnectionString"];
+                    var endpoint = configuration["CosmosDbEndpoint"];
+
+                    var options = new CosmosClientOptions
                     {
                         ConnectionMode = ConnectionMode.Gateway
                     };
-                    return new CosmosClient(settings.SubscriptionsConnectionString, options);
+
+                    if (!string.IsNullOrWhiteSpace(endpoint))
+                    {
+                        logger.LogInformation("Using DefaultAzureCredential for Cosmos DB (managed identity)");
+                        return new CosmosClient(endpoint, new DefaultAzureCredential(), options);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(connectionString))
+                    {
+                        logger.LogInformation("No managed identity found: using Cosmos DB connection string (local development)");
+                        return new CosmosClient(connectionString, options);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Neither CosmosDbEndpoint or a ConnectionString are configured");
+                    }
                 });
                 services.AddTransient<IValidate, Validate>();
                 services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
