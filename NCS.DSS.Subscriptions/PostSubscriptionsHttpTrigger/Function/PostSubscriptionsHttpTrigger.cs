@@ -48,16 +48,13 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
         {
             var functionName = nameof(PostSubscriptionsHttpTrigger);
 
-            _logger.LogInformation("Function {FunctionName} has been invoked", functionName);
+            _logger.LogTrace("Function {FunctionName} has been invoked", functionName);
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
 
-            if (string.IsNullOrEmpty(correlationId))
-                _logger.LogInformation("Unable to locate 'DssCorrelationId' in request header");
-
             if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
-                _logger.LogInformation("Unable to parse 'DssCorrelationId' to a Guid. New Guid Generated.");
+                _logger.LogTrace("Unable to parse 'DssCorrelationId' to a Guid. New Guid Generated.");
                 correlationGuid = Guid.NewGuid();
             }
 
@@ -73,13 +70,13 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
                 _logger.LogInformation($"PostSubscriptionsHttpTrigger Customers/{customerId}/Subscriptions customerGuid BadRequest");
                 return new BadRequestObjectResult(customerGuid);
             }
-            _logger.LogInformation("{CorrelationId} Input validation has succeeded.", correlationId);
+            _logger.LogTrace("{CorrelationId} Input validation has succeeded.", correlationId);
 
             Models.Subscriptions subscriptionsRequest;
 
             try
             {
-                _logger.LogInformation("{CorrelationId} Attempt to get resource from body of the request", correlationId);
+                _logger.LogTrace("{CorrelationId} Attempt to get resource from body of the request", correlationId);
 
                 subscriptionsRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Subscriptions>(req);
             }
@@ -93,32 +90,32 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             if (subscriptionsRequest == null)
             {
                 var response = new UnprocessableEntityObjectResult(req);
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. session patch request is null", correlationId, response.StatusCode);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. session patch request is null", correlationId, response.StatusCode);
                 return response;
             }
-            _logger.LogInformation("{CorrelationId} Attempt to set id's for subscription post", correlationId);
+            _logger.LogTrace("{CorrelationId} Attempt to set id's for subscription post", correlationId);
             subscriptionsRequest.SetIds(customerGuid, touchpointId);
-            _logger.LogInformation("{CorrelationId} Attempt to validate resource", correlationId);
+            _logger.LogTrace("{CorrelationId} Attempt to validate resource", correlationId);
             var errors = _validate.ValidateResource(subscriptionsRequest);
 
             if (errors != null && errors.Count > 0)
             {
                 var response = new UnprocessableEntityObjectResult(string.Join(',', errors));
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. validation errors with resource {Errors}", correlationId, response.StatusCode,errors);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. validation errors with resource {Errors}", correlationId, response.StatusCode,errors);
                 return response;
             }
 
-            _logger.LogInformation("{CorrelationId} Attempting to see if customer exists {customerGuid}", correlationId, customerGuid);
+            _logger.LogTrace("{CorrelationId} Attempting to see if customer exists {customerGuid}", correlationId, customerGuid);
 
             var doesCustomerExist = await _subscriptionsPostService.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
                 var response = new NoContentResult();
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. Customer does not exist {CustomerId}", correlationId, customerGuid);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Customer does not exist {CustomerId}", correlationId, customerGuid);
                 return response;
             }
-            _logger.LogInformation("{CorrelationId} Attempting to see if Subscription already exists for {customerGuid} and touchpoint with {touchpointId}", correlationId, customerGuid,touchpointId );
+            _logger.LogTrace("{CorrelationId} Attempting to see if Subscription already exists for {customerGuid} and touchpoint with {touchpointId}", correlationId, customerGuid,touchpointId );
 
             var doesSubscriptionExist = await _subscriptionsPostService.DoesSubscriptionExist(customerGuid, touchpointId);
 
@@ -126,26 +123,26 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             {
                 var duplicateError = _validate.ValidateResultForDuplicateSubscriptionId(doesSubscriptionExist.GetValueOrDefault());
                 var response = new ConflictResult();
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. Subscriptions exists for customer {customerGuid} and touchpoint with {touchpointId}. Error {Error}", correlationId, response.StatusCode, customerGuid, touchpointId, duplicateError.ErrorMessage);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Subscriptions exists for customer {customerGuid} and touchpoint with {touchpointId}. Error {Error}", correlationId, response.StatusCode, customerGuid, touchpointId, duplicateError.ErrorMessage);
                 return response;
             }
 
-            _logger.LogInformation("{CorrelationId} Attempting to Create Subscription for Customer {customerGuid}", correlationId, customerGuid);
+            _logger.LogTrace("{CorrelationId} Attempting to Create Subscription for Customer {customerGuid}", correlationId, customerGuid);
 
             var subscriptions = await _subscriptionsPostService.CreateAsync(subscriptionsRequest);
 
             if (subscriptions == null)
             {
                 var response = new BadRequestObjectResult(customerGuid);
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. Failed to Create the Subscription for Customer {customerGuid}", correlationId, response.StatusCode, customerGuid);
-                _logger.LogInformation("Function {FunctionName} has finished invoking", functionName);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Failed to Create the Subscription for Customer {customerGuid}", correlationId, response.StatusCode, customerGuid);
+                _logger.LogTrace("Function {FunctionName} has finished invoking", functionName);
                 return response;
             }
             else
             {
                 var response = new JsonResult(subscriptions, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.Created };
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. Successfully patched the Subscription for Customer {customerGuid}", correlationId, response.StatusCode, customerGuid);
-                _logger.LogInformation("Function {FunctionName} has finished invoking", functionName);
+                _logger.LogTrace("{CorrelationId} Response Status Code: {StatusCode}. Successfully patched the Subscription for Customer {customerGuid}", correlationId, response.StatusCode, customerGuid);
+                _logger.LogTrace("Function {FunctionName} has finished invoking", functionName);
                 return response;
             }
         }

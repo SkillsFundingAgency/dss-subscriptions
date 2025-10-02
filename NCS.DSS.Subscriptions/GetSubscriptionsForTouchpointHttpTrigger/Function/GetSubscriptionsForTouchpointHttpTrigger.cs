@@ -40,11 +40,9 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
         {
             var functionName = nameof(GetSubscriptionsForTouchpointHttpTrigger);
 
-            _logger.LogInformation("Function {FunctionName} has been invoked", functionName);
+            _logger.LogTrace("Function {FunctionName} has been invoked", functionName);
 
             var correlationId = _httpRequestMessageHelper.GetDssCorrelationId(req);
-            if (string.IsNullOrEmpty(correlationId))
-                _logger.LogInformation("Unable to locate 'DssCorrelationId' in request header");
 
             if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
@@ -56,38 +54,38 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
             if (string.IsNullOrEmpty(touchpointId))
             {
                 var response = new BadRequestObjectResult(HttpStatusCode.BadRequest);
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. Unable to locate 'TouchpointId' in request header", correlationId, response.StatusCode);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Unable to locate 'TouchpointId' in request header", correlationId, response.StatusCode);
                 return response;
             }
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
                 var response = new BadRequestObjectResult(customerGuid);
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. Unable to parse 'customerId' to a Guid: {customerId}", correlationId, customerId);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Unable to parse 'customerId' to a Guid: {customerId}", correlationId, customerId);
                 return response;
             }
 
-            _logger.LogInformation("{CorrelationId} Input validation has succeeded.", correlationId);
+            _logger.LogTrace("{CorrelationId} Input validation has succeeded.", correlationId);
 
-            _logger.LogInformation("{CorrelationId} Attempting to see if customer exists {customerGuid}", correlationId, customerGuid);
+            _logger.LogTrace("{CorrelationId} Attempting to see if customer exists {customerGuid}", correlationId, customerGuid);
             var doesCustomerExist = await _getSubscriptionsForTouchpointService.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
                 var response = new NoContentResult();
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. Customer does not exist {customerGuid}", correlationId, response.StatusCode, customerGuid);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Customer does not exist {customerGuid}", correlationId, response.StatusCode, customerGuid);
                 return response;
             }
-            _logger.LogInformation("{CorrelationId} Customer record found in Cosmos DB {customerGuid}", correlationId, customerGuid);
+            _logger.LogTrace("{CorrelationId} Customer record found in Cosmos DB {customerGuid}", correlationId, customerGuid);
 
-            _logger.LogInformation("{CorrelationId} Attempting to get Subscriptions for customer {customerGuid} and {touchpointId}", correlationId, customerGuid, touchpointId);
+            _logger.LogTrace("{CorrelationId} Attempting to get Subscriptions for customer {customerGuid} and {touchpointId}", correlationId, customerGuid, touchpointId);
             var subscriptions = await _getSubscriptionsForTouchpointService.GetSubscriptionsForTouchpointAsync(customerGuid, touchpointId);
 
             if (subscriptions == null)
             {
                 var response = new NoContentResult();
-                _logger.LogWarning("{CorrelationId} Response Status Code: {StatusCode}. Subscriptions does not exist for customer {customerGuid} and {touchpointId}", correlationId, response.StatusCode, customerGuid, touchpointId);
-                _logger.LogInformation("Function {FunctionName} has finished invoking", functionName);
+                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Subscriptions does not exist for customer {customerGuid} and {touchpointId}", correlationId, response.StatusCode, customerGuid, touchpointId);
+                _logger.LogTrace("Function {FunctionName} has finished invoking", functionName);
                 return response;
             }
 
@@ -95,8 +93,8 @@ namespace NCS.DSS.Subscriptions.GetSubscriptionsForTouchpointHttpTrigger.Functio
             {
                 StatusCode = (int)HttpStatusCode.OK
             };
-            _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Get session succeeded for customer {customerGuid} and {touchpointId}", correlationId, jsonResponse.StatusCode, customerGuid, touchpointId);
-            _logger.LogInformation("Function {FunctionName} has finished invoking", functionName);
+            _logger.LogTrace("{CorrelationId} Response Status Code: {StatusCode}. Get session succeeded for customer {customerGuid} and {touchpointId}", correlationId, jsonResponse.StatusCode, customerGuid, touchpointId);
+            _logger.LogTrace("Function {FunctionName} has finished invoking", functionName);
             if (subscriptions.Count > 1)            
             {               
                 jsonResponse.Value = subscriptions;
