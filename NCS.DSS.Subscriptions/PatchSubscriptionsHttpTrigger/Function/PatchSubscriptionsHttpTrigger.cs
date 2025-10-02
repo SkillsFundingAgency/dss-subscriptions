@@ -146,7 +146,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
             else
             {
                 var response = new JsonResult(updatedSubscriptions, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
-                _logger.LogInformation("{CorrelationId} Response Status Code: {StatusCode}. Successfully patched the Subscription with ID {subscriptionsGuid}", correlationId, response.StatusCode, subscriptionsGuid);
+                _logger.LogTrace("{CorrelationId} Response Status Code: {StatusCode}. Successfully patched the Subscription with ID {subscriptionsGuid}", correlationId, response.StatusCode, subscriptionsGuid);
                 _logger.LogTrace("Function {FunctionName} has finished invoking", functionName);
                 return response;
             }   
