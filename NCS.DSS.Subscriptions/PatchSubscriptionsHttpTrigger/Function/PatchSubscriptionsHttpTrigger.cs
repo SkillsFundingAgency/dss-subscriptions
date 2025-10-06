@@ -54,7 +54,7 @@ namespace NCS.DSS.Subscriptions.PatchSubscriptionsHttpTrigger.Function
 
             if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
-                _logger.LogTrace("Unable to parse 'DssCorrelationId' to a Guid. New Guid Generated.");
+                _logger.LogInformation("Unable to parse 'DssCorrelationId' to a Guid. New Guid Generated.");
                 correlationGuid = Guid.NewGuid();
             }
             var touchpointId = _httpRequestMessageHelper.GetDssTouchpointId(req);
