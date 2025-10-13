@@ -11,9 +11,6 @@
     "cosmosDbEndpoint": {
       "type": "string"
     },
-    "cosmosDbKey": {
-      "type": "string"
-    },
     "environmentName": {
       "type": "string"
     },
@@ -43,6 +40,9 @@
     },
     "appInsightsInstrumentationKey": {
       "type": "string"
+    },
+    "keyVaultName": {
+      "type": "string"
     }
   },
   "resources": [
@@ -59,7 +59,7 @@
         "CollectionId": "[parameters('cosmosDbCollectionId')]",
         "DatabaseId": "[parameters('cosmosDbDatabaseId')]",
         "CosmosDbEndpoint": "[parameters('cosmosDbEndpoint')]",
-        "Key": "[parameters('cosmosDbKey')]",
+        "Key": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=CosmosDbAccessKey)', parameters('keyVaultName'))]",
         "CustomerCollectionId": "customers",
         "CustomerDatabaseId": "customers"
       },
