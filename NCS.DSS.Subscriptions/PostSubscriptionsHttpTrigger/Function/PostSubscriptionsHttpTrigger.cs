@@ -82,7 +82,7 @@ namespace NCS.DSS.Subscriptions.PostSubscriptionsHttpTrigger.Function
             }
             catch (Exception ex)
             {
-                var response = new UnprocessableEntityObjectResult(_convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException"]));
+                var response = new UnprocessableEntityObjectResult(_convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException", "StackTrace"]));
                 _logger.LogError(ex, "{CorrelationId} Response Status Code: {StatusCode}. Unable to retrieve body from req", correlationId, response.StatusCode);
                 return response;
             }
