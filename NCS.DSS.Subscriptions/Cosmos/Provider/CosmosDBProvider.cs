@@ -36,11 +36,11 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
                     var response = await queryCust.ReadNextAsync();
                     if (response != null && response.Resource.Any())
                     {
-                        _logger.LogInformation("Customer Record found in Cosmos DB for {CustomerID}", customerId);
+                        _logger.LogTrace("Customer Record found in Cosmos DB for {CustomerID}", customerId);
                         return true;
                     }
                 }
-                _logger.LogWarning("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
+                _logger.LogInformation("No Customer Record found with {CustomerID} in Cosmos DB", customerId);
                 return false;
             }
             catch (CosmosException ce)
@@ -62,11 +62,11 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
                     var response = await querySubs.ReadNextAsync();
                     if (response != null && response.Resource.Any())
                     {
-                        _logger.LogInformation("Subscription Record found with Touchpoint ID {touchpointId} in Cosmos DB for Customer with ID {CustomerID}", touchpointId, customerId);
+                        _logger.LogTrace("Subscription Record found with Touchpoint ID {touchpointId} in Cosmos DB for Customer with ID {CustomerID}", touchpointId, customerId);
                         return response.Resource.FirstOrDefault().SubscriptionId;
                     }
                 }
-                _logger.LogWarning("No Subscription found with Touchpoint ID {touchpointId} and Customer ID {CustomerID} in Cosmos DB", touchpointId, customerId);
+                _logger.LogInformation("No Subscription found with Touchpoint ID {touchpointId} and Customer ID {CustomerID} in Cosmos DB", touchpointId, customerId);
                 return null;
             }
             catch (CosmosException ce)
@@ -87,11 +87,11 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
                     var response = await querySubs.ReadNextAsync();
                     if (response != null && response.Resource.Any())
                     {
-                        _logger.LogInformation("Retrieved All Subscriptions in Cosmos Database");
+                        _logger.LogTrace("Retrieved All Subscriptions in Cosmos Database");
                         return response.Resource.ToList();
                     }
                 }
-                _logger.LogWarning("No Subscriptions found in Cosmos DB");
+                _logger.LogInformation("No Subscriptions found in Cosmos DB");
                 return null;
             }
             catch (CosmosException ce)
@@ -114,11 +114,11 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
                     var response = await querySubs.ReadNextAsync();
                     if (response != null && response.Resource.Any())
                     {
-                        _logger.LogInformation("Subscription Record found with ID {subscriptionId} in Cosmos DB for Customer with ID {CustomerID}", subscriptionId, customerId);
+                        _logger.LogTrace("Subscription Record found with ID {subscriptionId} in Cosmos DB for Customer with ID {CustomerID}", subscriptionId, customerId);
                         return response.Resource.FirstOrDefault();
                     }
                 }
-                _logger.LogWarning("No Subscription found with ID {subscriptionId} and Customer ID {CustomerID} in Cosmos DB", subscriptionId, customerId);
+                _logger.LogInformation("No Subscription found with ID {subscriptionId} and Customer ID {CustomerID} in Cosmos DB", subscriptionId, customerId);
                 return null;
             }
             catch (CosmosException ce)
@@ -141,11 +141,11 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
                     var response = await querySubs.ReadNextAsync();
                     if (response != null && response.Resource.Any())
                     {
-                        _logger.LogInformation("Subscriptions found with Touchpoint ID {touchpointId} in Cosmos DB for Customer with ID {CustomerID}", touchpointId, customerId);
+                        _logger.LogTrace("Subscriptions found with Touchpoint ID {touchpointId} in Cosmos DB for Customer with ID {CustomerID}", touchpointId, customerId);
                         return response.Resource.ToList();
                     }
                 }
-                _logger.LogWarning("No Subscriptions found with Touchpoint ID {touchpointId} and Customer ID {CustomerID} in Cosmos DB", touchpointId, customerId);
+                _logger.LogInformation("No Subscriptions found with Touchpoint ID {touchpointId} and Customer ID {CustomerID} in Cosmos DB", touchpointId, customerId);
                 return null;
             }
             catch (CosmosException ce)
@@ -163,7 +163,7 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
                 var response = await _container.CreateItemAsync(subscriptions, null);
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
-                    _logger.LogInformation("Subscription Record Created in Cosmos DB for {SubscriptionId}", subscriptions.SubscriptionId);
+                    _logger.LogTrace("Subscription Record Created in Cosmos DB for {SubscriptionId}", subscriptions.SubscriptionId);
                 }
                 else
                 {
@@ -187,7 +187,7 @@ namespace NCS.DSS.Subscriptions.Cosmos.Provider
                 var response = await _container.ReplaceItemAsync(subscriptions, subscriptionId.ToString());
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    _logger.LogInformation("Session Record Updated in Cosmos DB for {SubscriptionId}", subscriptionId);
+                    _logger.LogTrace("Session Record Updated in Cosmos DB for {SubscriptionId}", subscriptionId);
                 }
                 else
                 {
